@@ -33,6 +33,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  if(employee?.role.id === 2 && (
+    request.nextUrl.pathname.startsWith("/employees/edit") 
+    || request.nextUrl.pathname.startsWith("/employees/create") 
+  )) {
+    return NextResponse.redirect(new URL("/employees", request.url));
+  }
+
   return NextResponse.next();
 }
 

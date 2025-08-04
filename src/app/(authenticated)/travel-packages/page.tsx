@@ -2,11 +2,9 @@
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetTravelPackages } from "@/hooks/travel.hook";
-import { ToastApi } from "@/lib/helper/toast-api";
-import { TravelPackagesTable } from "./_components/table";
+import { TravelPackagesTable } from "./_components/travel-table";
 import { TravelPackages } from "@/interfaces";
 import { useEffect, useState } from "react";
-import { convertTravelImageUrl } from "@/lib/helper/images-url";
 import { Button } from "@/components/ui/button";
 import { PlusSquare } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -31,10 +29,6 @@ export default function TravelPackagesPage() {
 
   const handleCreateTravelPackage = () => {
     redirect("/travel-packages/create");
-  };
-
-  const handleEditTravelPackage = (id: number) => {
-    redirect(`/travel-packages/edit/${id}`);
   };
 
   useEffect(() => {
@@ -72,9 +66,9 @@ export default function TravelPackagesPage() {
                 </p>
               </div>
               <div>
-                <Button onClick={handleCreateTravelPackage} className="flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
+                <Button onClick={handleCreateTravelPackage} className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
                   <PlusSquare className="h-4 w-4" />
-                  <span>Create New Package</span>
+                  <span className="hidden md:block">Create New Package</span>
                 </Button>
               </div>
             </div>

@@ -30,7 +30,6 @@ const adminData = {
   teams: [
     {
       name: "Ride Bali Explore",
-      logo: GalleryVerticalEnd,
       plan: "",
     },
   ],
@@ -81,8 +80,14 @@ const ownerData = {
   teams: [
     {
       name: "Ride Bali Explore",
-      logo: GalleryVerticalEnd,
       plan: "",
+    },
+  ],
+  operationals: [
+    {
+      name: "Bookings",
+      url: "/bookings",
+      icon: CalendarCheck,
     },
   ],
   masters: [
@@ -95,13 +100,6 @@ const ownerData = {
       title: "Employees",
       url: "/employees",
       icon: IdCardLanyardIcon,
-    },
-  ],
-  operationals: [
-    {
-      name: "Bookings",
-      url: "/bookings",
-      icon: CalendarCheck,
     },
   ],
 };

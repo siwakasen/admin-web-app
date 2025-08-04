@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent } from "@/components/ui/card";
-import { TravelPackagesForm } from "@/components/shared/travel-packages-form";
-import { TravelImagesForm } from "@/components/shared/travel-images-form";
+import { TravelPackagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-packages-form";
+import { TravelImagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-images-form";
 import { useGetTravelPackagesDetail, useUpdateTravelPackage } from "@/hooks/travel.hook";
 import { toast } from "sonner";
 import { Check, Loader2 } from "lucide-react";
@@ -46,7 +46,8 @@ export default function EditTravelPackagePage() {
 
   const handleTravelPackageSubmit = async (data: TypeTravelPackageSchema) => {
     try {
-      const response: UpdateTravelPackageResponse | {status?: number, errors?: any} = await useUpdateTravelPackage(packageId, data);
+      const response: UpdateTravelPackageResponse | {status?: number, errors?: any} 
+      = await useUpdateTravelPackage(packageId, data);
       if('errors' in response) {
         if(response.status === 403) {
           toast.error("You are not authorized to update this travel package");

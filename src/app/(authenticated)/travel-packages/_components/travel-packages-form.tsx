@@ -95,7 +95,6 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
         includes: filteredIncludes,
       };
       
-      console.log(formattedData);
       
       onNext(formattedData);
     } catch (error) {
@@ -332,7 +331,7 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="cursor-pointer">
             {isSubmitting ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update" : "Next")}
           </Button>
         </div>

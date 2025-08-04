@@ -1,3 +1,5 @@
+import { Meta } from "./common.interface";
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -12,6 +14,26 @@ export interface LoginResponse {
 
 export interface EmployeeResponse {
   data: Employee;
+  message: string;
+}
+
+export interface GetAllEmployeesResponse {
+  data: Employee[];
+  meta: Meta
+}
+
+export interface CreateEmployeeRequest {
+  name: string;
+  email: string;
+  password: string;
+  role_id: number;
+  salary: number;
+}
+
+export interface CreateEmployeeResponse {
+  message: string;
+}
+export interface DeleteEmployeeResponse {
   message: string;
 }
 
@@ -46,5 +68,15 @@ export interface ChangePasswordRequest {
 }
 
 export interface ChangePasswordResponse {
+  message: string;
+}
+
+export interface UpdateEmployeeRequest {
+  name: string;
+  role_id: number;
+  salary: number;
+}
+
+export interface UpdateEmployeeResponse {
   message: string;
 }

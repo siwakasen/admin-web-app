@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent } from "@/components/ui/card";
-import { TravelPackagesForm } from "@/components/shared/travel-packages-form";
-import { TravelImagesForm } from "@/components/shared/travel-images-form";
+import { TravelPackagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-packages-form";
 import { useCreateTravelPackage } from "@/hooks/travel.hook";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
 import { CreateTravelPackageResponse } from "@/interfaces";
 import { TypeTravelPackageSchema } from "@/lib/validations/travel.schemas";
 import { useRouter } from "next/navigation";
+import { ToastApi } from "@/lib/helper/toast-api";
 
 export default function CreateTravelPackagePage() {
   const [currentStep, setCurrentStep] = useState(1);

@@ -217,6 +217,7 @@ export function TravelImagesForm({ packageId, onBack, isEditing = false, existin
           type="button"
           onClick={handleSubmit}
           disabled={isUploading || (images.length === 0 && existingImages.length === 0)}
+          className="cursor-pointer"
         >
           {isUploading ? "Uploading..." : (isEditing ? "Update Images" : "Save Images")}
         </Button>

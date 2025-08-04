@@ -1,12 +1,12 @@
 "use server";
-import { ChangePasswordRequest, Employee, EmployeeResponse } from "@/interfaces";
+import { ChangePasswordRequest, CreateEmployeeRequest, CreateEmployeeResponse, DeleteEmployeeResponse, Employee, EmployeeResponse, GetAllEmployeesResponse, Pagination, UpdateEmployeeRequest, UpdateEmployeeResponse } from "@/interfaces";
 import { createSession, deleteSession, getToken } from "@/lib/user-provider";
 import {
   ChangePasswordFormSchemaType,
   ForgetPasswordFormSchemaType,
   LoginFormSchemaType,
 } from "@/lib/validations";
-import { changePassword, forgetPassword, getALlEmployees, getEmployee, login } from "@/services";
+import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
@@ -72,7 +72,6 @@ export async function useForgetPasswordUser(
       message: message || "Email to reset password sent!",
     };
   } catch (error: any) {
-    console.log(error.response);
     return {
       status: error.response.status,
       errors: error.response.data,
@@ -94,10 +93,62 @@ export async function useChangePasswordUser(
   }
 }
 
-export async function useGetAllEmployees(): Promise< EmployeeResponse| { status?: number; errors?: any }> {
+export async function useGetAllEmployees(pagination?: Pagination): Promise<GetAllEmployeesResponse | { status?: number; errors?: any }> {
   try {
     const token = (await getToken()) || "";
-    const response = await getALlEmployees(token);
+    const response = await getAllEmployees(token, pagination);
+    return response;
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useGetEmployeeById(id: number): Promise<EmployeeResponse | { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await getEmployeeById(token, id);
+    return response;
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useCreateEmployee(payload: CreateEmployeeRequest): Promise<CreateEmployeeResponse | { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await createEmployee(token, payload);
+    return response;
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useUpdateEmployee(id: number, payload: UpdateEmployeeRequest): Promise<UpdateEmployeeResponse | { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await updateEmployee(token, id, payload);
+    return response;
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useDeleteEmployee(id: number): Promise<DeleteEmployeeResponse | { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await deleteEmployee(token, id);
     return response;
   } catch (error: any) {
     return {
