@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   experimental: {
     useCache: true,
     serverActions: {
-      bodySizeLimit: "50mb",
+      bodySizeLimit: "200mb",
     },
   },
 };

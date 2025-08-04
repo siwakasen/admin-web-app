@@ -48,3 +48,12 @@ export const changePassword = async (
   const response = await api.post("/employees/change-password", payload);
   return response.data;
 };
+
+export const getALlEmployees = async (token: string): Promise<EmployeeResponse> => {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_EMPLOYEES_API_URL,
+    token
+  );
+  const response = await api.get("/employees");
+  return response.data;
+};

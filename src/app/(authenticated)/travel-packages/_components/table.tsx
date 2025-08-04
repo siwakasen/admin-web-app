@@ -39,6 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -71,6 +72,8 @@ export function TravelPackagesTable({
   onRefetch,
 }: TravelPackagesTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [packageToDelete, setPackageToDelete] = useState<TravelPackages | null>(null);
   const toggleRowExpansion = (id: number) => {
     const newExpanded = new Set(expandedRows);
     if (newExpanded.has(id)) {
@@ -81,9 +84,16 @@ export function TravelPackagesTable({
     setExpandedRows(newExpanded);
   };
 
-  const handleDelete = async (id: number) => {
-    try{
-      const response:DeleteTravelPackageResponse | {status?: number, errors?: any} = await useDeleteTravelPackage(id);
+  const handleDeleteClick = (pkg: TravelPackages) => {
+    setPackageToDelete(pkg);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!packageToDelete) return;
+    
+    try {
+      const response: DeleteTravelPackageResponse | {status?: number, errors?: any} = await useDeleteTravelPackage(packageToDelete.id);
       if('errors' in response) {
         toast.error(response.errors?.message || "Failed to delete travel package");
       } else if('data' in response) {
@@ -93,8 +103,16 @@ export function TravelPackagesTable({
     } catch (error) {
       console.error("Error deleting travel package:", error);
       toast.error("Failed to delete travel package. Please try again.");
+    } finally {
+      setDeleteDialogOpen(false);
+      setPackageToDelete(null);
     }
-  }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setPackageToDelete(null);
+  };
 
   const handleEdit = (id: number) => {
     redirect(`/travel-packages/edit/${id}`);
@@ -147,12 +165,13 @@ export function TravelPackagesTable({
             ) : (
               packages.map((pkg) => (
                 <React.Fragment key={pkg.id}>
-                  <TableRow className="hover:bg-muted/50">
+                  <TableRow className="hover:bg-muted/50 cursor-pointer" >
                     <TableCell>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleRowExpansion(pkg.id)}
+                        className="cursor-pointer"
                       >
                         {expandedRows.has(pkg.id) ? (
                           <ChevronUp className="h-4 w-4" />
@@ -203,7 +222,7 @@ export function TravelPackagesTable({
                     <TableCell className="text-right w-[120px]">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -233,7 +252,7 @@ export function TravelPackagesTable({
                               Edit
                             </DropdownMenuItem>
                             
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDelete(pkg.id)}>
+                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteClick(pkg)}>
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
                             </DropdownMenuItem>
@@ -342,6 +361,26 @@ export function TravelPackagesTable({
           </Pagination>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Travel Package</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{packageToDelete?.package_name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleDeleteCancel}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

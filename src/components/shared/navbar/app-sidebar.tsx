@@ -25,24 +25,13 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Employee } from "@/interfaces";
-import { toast } from "sonner";
 
-const data = {
+const adminData = {
   teams: [
     {
-      name: "Acme Inc",
+      name: "Ride Bali Explore",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
+      plan: "",
     },
   ],
   masters: [
@@ -68,7 +57,7 @@ const data = {
       icon: IdCardLanyardIcon,
     },
   ],
-  projects: [
+  operationals: [
     {
       name: "Bookings",
       url: "/bookings",
@@ -88,6 +77,35 @@ const data = {
   ],
 };
 
+const ownerData = {
+  teams: [
+    {
+      name: "Ride Bali Explore",
+      logo: GalleryVerticalEnd,
+      plan: "",
+    },
+  ],
+  masters: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: CalendarCheck,
+    },
+    {
+      title: "Employees",
+      url: "/employees",
+      icon: IdCardLanyardIcon,
+    },
+  ],
+  operationals: [
+    {
+      name: "Bookings",
+      url: "/bookings",
+      icon: CalendarCheck,
+    },
+  ],
+};
+
 export function AppSidebar({
   employee,
   ...props
@@ -97,11 +115,11 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={employee.role.id === 1 ? ownerData.teams : adminData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavDataMasters items={data.masters} />
-        <NavOperationals projects={data.projects} />
+        <NavDataMasters items={employee.role.id === 1 ? ownerData.masters : adminData.masters} />
+        <NavOperationals operationals={employee.role.id === 1 ? ownerData.operationals : adminData.operationals} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={employee} />

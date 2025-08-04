@@ -1,12 +1,12 @@
 "use server";
-import { ChangePasswordRequest } from "@/interfaces";
+import { ChangePasswordRequest, Employee, EmployeeResponse } from "@/interfaces";
 import { createSession, deleteSession, getToken } from "@/lib/user-provider";
 import {
   ChangePasswordFormSchemaType,
   ForgetPasswordFormSchemaType,
   LoginFormSchemaType,
 } from "@/lib/validations";
-import { changePassword, forgetPassword, getEmployee, login } from "@/services";
+import { changePassword, forgetPassword, getALlEmployees, getEmployee, login } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
@@ -86,6 +86,19 @@ export async function useChangePasswordUser(
   try {
     const { message } = await changePassword(formData);
     return { message };
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useGetAllEmployees(): Promise< EmployeeResponse| { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await getALlEmployees(token);
+    return response;
   } catch (error: any) {
     return {
       status: error.response.status,
