@@ -10,11 +10,9 @@ import { Check } from "lucide-react";
 import { CreateTravelPackageResponse } from "@/interfaces";
 import { TypeTravelPackageSchema } from "@/lib/validations/travel.schemas";
 import { useRouter } from "next/navigation";
-import { ToastApi } from "@/lib/helper/toast-api";
 
 export default function CreateTravelPackagePage() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [packageId, setPackageId] = useState<number | null>(null);
+  const currentStep = 1;
   const router = useRouter();
 
 
@@ -29,10 +27,9 @@ export default function CreateTravelPackagePage() {
           toast.error(response.errors?.message || "Failed to create travel package");
         }
         return;
-      } else if('data' in response) {
-        toast.success("Travel package created successfully!");
-        // Redirect to edit page with step 2
-        router.push(`/travel-packages/edit/${response.data?.id}?step=2`);
+      } else if('data' in response && 'message' in response) {
+        toast.success(response.message);
+        router.push(`/travel-packages/edit/${response.data.id}?step=2`);
       }        
     } catch (error) {
       console.error("Error creating travel package:", error);

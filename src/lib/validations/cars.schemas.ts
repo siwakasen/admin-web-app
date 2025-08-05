@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const CarSchema = z.object({
   car_name: z.string().min(1, { message: "Car name is required" }),
-  car_image: z.string().min(1, { message: "Car image is required" }),
   car_color: z.string().min(1, { message: "Car color is required" }),
   police_number: z.string().min(1, { message: "Police number is required" }),
   transmission: z.string().min(1, { message: "Transmission is required" }),

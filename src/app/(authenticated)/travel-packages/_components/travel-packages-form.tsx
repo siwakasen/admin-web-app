@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TravelPackageSchema } from "@/lib/validations/travel.schemas";
+import { TravelPackageSchema, TypeTravelPackageSchema } from "@/lib/validations/travel.schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { TravelPackages } from "@/interfaces";
+import { Trash } from "lucide-react";
 
 interface TravelPackagesFormProps {
   onNext: (data: any) => void;
@@ -56,34 +57,33 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
     }
   }, [initialData, isEditing, form]);
 
-  const onSubmit = async (data: any) => {
+  // Watch arrays and validate
+  const itineraries = form.watch("itineraries");
+  const includes = form.watch("includes");
+  useEffect(() => {
+    if (form.formState.isSubmitted) {
+      validateItineraries();
+      validateIncludes();
+    }
+  }, [itineraries, includes, form.formState.isSubmitted]);
+
+  const onSubmit = async (data: TypeTravelPackageSchema) => {
     setIsSubmitting(true);
     try {
-      // Filter out empty strings and validate
+      // Validate itineraries and includes before submission
+      if (!validateItineraries()) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!validateIncludes()) {
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Filter out empty strings
       const filteredItineraries = data.itineraries.filter((item: string) => item.trim() !== "");
       const filteredIncludes = data.includes.filter((item: string) => item.trim() !== "");
-      
-      // Check if we have at least one non-empty item in each array
-      if (filteredItineraries.length === 0) {
-        form.setError("itineraries", {
-          type: "manual",
-          message: "Itineraries are required"
-        });
-        setIsSubmitting(false);
-        return;
-      }
-      
-      if (filteredIncludes.length === 0) {
-        form.setError("includes", {
-          type: "manual",
-          message: "Includes are required"
-        });
-        setIsSubmitting(false);
-        return;
-      }
-      
-      // Clear any existing errors
-      form.clearErrors(["itineraries", "includes"]);
       
       // Convert string arrays to proper format
       const formattedData = {
@@ -94,7 +94,6 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
         itineraries: filteredItineraries,
         includes: filteredIncludes,
       };
-      
       
       onNext(formattedData);
     } catch (error) {
@@ -109,7 +108,7 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
     form.setValue("itineraries", [...currentItineraries, ""], { shouldValidate: true });
     // Trigger validation after adding
     setTimeout(() => {
-      form.trigger("itineraries");
+      validateItineraries();
     }, 0);
   };
 
@@ -119,7 +118,7 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
       form.setValue("itineraries", currentItineraries.filter((_, i) => i !== index), { shouldValidate: true });
       // Trigger validation after removing
       setTimeout(() => {
-        form.trigger("itineraries");
+        validateItineraries();
       }, 0);
     }
   };
@@ -129,7 +128,7 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
     form.setValue("includes", [...currentIncludes, ""], { shouldValidate: true });
     // Trigger validation after adding
     setTimeout(() => {
-      form.trigger("includes");
+      validateIncludes();
     }, 0);
   };
 
@@ -139,14 +138,71 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
       form.setValue("includes", currentIncludes.filter((_, i) => i !== index), { shouldValidate: true });
       // Trigger validation after removing
       setTimeout(() => {
-        form.trigger("includes");
+        validateIncludes();
       }, 0);
     }
   };
 
+   // Custom validation for includes array
+   const validateItineraries = () => {
+    const itineraries = form.getValues("itineraries");
+    const filteredItineraries = itineraries.filter((item: string) => item.trim() !== "");
+    
+    if (filteredItineraries.length === 0) {
+      form.setError("itineraries", {
+        type: "manual",
+        message: "At least one itinerary item is required"
+      });
+      return false;
+    }
+    
+    form.clearErrors(["itineraries"]);
+    return true;
+  };
+
+ // Custom validation for includes array
+ const validateIncludes = () => {
+  const includes = form.getValues("includes");
+  const filteredIncludes = includes.filter((item: string) => item.trim() !== "");
+  
+  if (filteredIncludes.length === 0) {
+    form.setError("includes", {
+      type: "manual",
+      message: "At least one include item is required"
+    });
+    return false;
+  }
+  
+  form.clearErrors(["includes"]);
+  return true;
+};
+
+  const handleSubmit = async (data: TypeTravelPackageSchema ) => {
+    // Validate includes before submission
+    if (!validateItineraries()) {
+      return;
+    }
+
+    if (!validateIncludes()) {
+      return;
+    }
+    
+    await onSubmit(data);
+  };
+  const handleFormSubmit = form.handleSubmit(handleSubmit);
+  const handleFormSubmitWithValidation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Force validation first
+    validateItineraries();
+    validateIncludes();
+    // Then proceed with form submission
+    await handleFormSubmit(e);
+  };
+
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleFormSubmitWithValidation} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -264,7 +320,15 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
                           e.preventDefault();
                           addItinerary();
                         }
-                      }} />
+                      }} 
+                      onChange={(e) => {
+                        field.onChange(e);
+                        // Trigger validation after a short delay
+                        setTimeout(() => {
+                          validateItineraries();
+                        }, 100);
+                      }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +341,7 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
                   size="sm"
                   onClick={() => removeItinerary(index)}
                 >
-                  Remove
+                  <Trash className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -286,6 +350,12 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
             <FormMessage>
               {form.formState.errors.itineraries.message}
             </FormMessage>
+          )}
+          {/* Debug: Show current itineraries state */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-xs text-gray-500 mt-2">
+              Debug: Itineraries count: {form.watch("itineraries").filter((item: string) => item.trim() !== "").length}
+            </div>
           )}
         </div>
 
@@ -315,7 +385,15 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
                           e.preventDefault();
                           addInclude();
                         }
-                      }} />
+                      }} 
+                      onChange={(e) => {
+                        field.onChange(e);
+                        // Trigger validation after a short delay
+                        setTimeout(() => {
+                          validateIncludes();
+                        }, 100);
+                      }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -328,7 +406,7 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
                   size="sm"
                   onClick={() => removeInclude(index)}
                 >
-                  Remove
+                  <Trash className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -337,6 +415,12 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
             <FormMessage>
               {form.formState.errors.includes.message}
             </FormMessage>
+          )}
+          {/* Debug: Show current includes state */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-xs text-gray-500 mt-2">
+              Debug: Includes count: {form.watch("includes").filter((item: string) => item.trim() !== "").length}
+            </div>
           )}
         </div>
 

@@ -13,13 +13,14 @@ import { TypeCarSchema } from "@/lib/validations/cars.schemas";
 import { useRouter } from "next/navigation";
 
 export default function CreateCarPage() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [carId, setCarId] = useState<number | null>(null);
+  const currentStep = 1;
   const router = useRouter();
 
   const handleCarSubmit = async (data: TypeCarSchema) => {
+    console.log(data);
     try {
       const response: CarsDetailResponse | {status?: number, errors?: any} = await useCreateCar(data);
+      console.log(response);
       if('errors' in response) {
         if(response.status === 403) {
           toast.error("You are not authorized to create a car");
@@ -27,10 +28,9 @@ export default function CreateCarPage() {
           toast.error(response.errors?.message || "Failed to create car");
         }
         return;
-      } else if('data' in response) {
-        setCarId(response.data?.id);
-        setCurrentStep(2);
-        toast.success("Car created successfully! Now add an image.");
+      } else if('data' in response && 'message' in response) {
+        toast.success(response.message);
+        router.push(`/cars/edit/${response.data.id}?step=2`);
       }        
     } catch (error) {
       console.error("Error creating car:", error);
@@ -118,20 +118,7 @@ export default function CreateCarPage() {
                     Fill in the details for your new car.
                   </p>
                 </div>
-                {currentStep === 1 && (
-                  <CarsForm onNext={handleCarSubmit} />
-                )}
-
-                {currentStep === 2 && carId && (
-                  <CarsImageForm
-                    carId={carId}
-                    onBack={() => setCurrentStep(1)}
-                    onRefetch={() => {
-                      // Redirect to cars page after image upload
-                      router.push("/cars");
-                    }}
-                  />
-                )}
+                <CarsForm onNext={handleCarSubmit} />
               </div>
             </CardContent>
           </Card>

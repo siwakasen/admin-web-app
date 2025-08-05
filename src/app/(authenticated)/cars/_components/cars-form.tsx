@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CarSchema } from "@/lib/validations/cars.schemas";
+import { CarSchema, TypeCarSchema } from "@/lib/validations/cars.schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { Car } from "@/interfaces";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 
 interface CarsFormProps {
   onNext: (data: any) => void;
@@ -28,12 +28,12 @@ interface CarsFormProps {
 
 export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditing);
 
   const form = useForm({
     resolver: zodResolver(CarSchema),
     defaultValues: {
       car_name: "",
-      car_image: "",
       car_color: "",
       police_number: "",
       transmission: "",
@@ -43,7 +43,6 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
       includes: [""],
     },
     mode: "onChange",
-    reValidateMode: "onChange",
   });
 
   // Set initial values when editing
@@ -51,7 +50,6 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
     if (initialData && isEditing) {
       form.reset({
         car_name: initialData.car_name,
-        car_image: initialData.car_image,
         car_color: initialData.car_color,
         police_number: initialData.police_number,
         transmission: initialData.transmission,
@@ -60,6 +58,9 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
         price_per_day: initialData.price_per_day,
         includes: initialData.includes.length > 0 ? initialData.includes : [""],
       });
+      setIsLoading(false);
+    } else if (!isEditing) {
+      setIsLoading(false);
     }
   }, [initialData, isEditing, form]);
 
@@ -73,7 +74,7 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
 
 
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: TypeCarSchema) => {
     setIsSubmitting(true);
     try {
       // Validate includes array
@@ -91,9 +92,8 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
         max_persons: Number(data.max_persons),
         price_per_day: Number(data.price_per_day),
         includes: filteredIncludes,
-        car_image: "", // Empty string for now, will be handled in image form
       };
-      
+
       onNext(formattedData);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -140,7 +140,7 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
   };
 
   // Force validation on form submission
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: TypeCarSchema ) => {
     // Validate includes before submission
     if (!validateIncludes()) {
       return;
@@ -149,19 +149,29 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
     await onSubmit(data);
   };
 
-  // Trigger validation when form is submitted
-  const handleFormSubmit = form.handleSubmit(handleSubmit);
-  const handleFormSubmitWithValidation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Force validation first
-    validateIncludes();
-    // Then proceed with form submission
-    await handleFormSubmit(e);
-  };
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-24 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={handleFormSubmitWithValidation} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6" onInvalid={(e) => {
+      }}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Car Name */}
           <FormField
@@ -215,7 +225,7 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Transmission</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select transmission type" />
@@ -338,12 +348,12 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
                       {form.watch("includes").length > 1 && (
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="destructive"
                           size="sm"
                           onClick={() => removeInclude(index)}
                           className="flex items-center gap-2"
                         >
-                          <X className="h-4 w-4" />
+                          <Trash className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
@@ -371,7 +381,7 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 cursor-pointer"
           >
             {isSubmitting ? "Creating..." : (isEditing ? "Update Car" : "Create Car")}
           </Button>

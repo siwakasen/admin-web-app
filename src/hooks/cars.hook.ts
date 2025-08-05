@@ -1,7 +1,7 @@
 "use server";
 
-import { CarsDetailResponse, CarsResponse, CreateCarRequest, Pagination } from "@/interfaces";
-import { getCarDetail, getAllCars, deleteCar, createCar } from "@/services";
+import { CarsDetailResponse, CarsResponse, CreateUpdateCarRequest, Pagination } from "@/interfaces";
+import { getCarDetail, getAllCars, deleteCar, createCar, updateCar, uploadCarImage } from "@/services";
 import { getToken } from "@/lib/user-provider";
 import { redirect, RedirectType } from "next/navigation";
 
@@ -13,11 +13,24 @@ export async function useGetCarDetail(id: number): Promise<CarsDetailResponse> {
   return await getCarDetail(id);
 }   
 
-export async function useDeleteCar(id: number): Promise<{ data: { message: string }; message: string }> {
-  return await deleteCar(id);
+export async function useDeleteCar(id: number): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
+  const token = (await getToken()) || "";
+  if (!token) {
+    console.warn("No token found");
+    redirect("/redirect/reset-cookie", RedirectType.replace);
+  }
+  try {
+    return await deleteCar(id, token);
+  } catch (error: any) {
+    console.warn("Hooks:", error.response.data);
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
 }
 
-export async function useCreateCar(payload: CreateCarRequest): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
+export async function useCreateCar(payload: CreateUpdateCarRequest): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";
   if (!token) {
     console.warn("No token found");
@@ -33,3 +46,38 @@ export async function useCreateCar(payload: CreateCarRequest): Promise<CarsDetai
       };
     }
 }
+
+export async function useUploadCarImage(id: number, image: File): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
+  const token = (await getToken()) || "";
+  if (!token) {
+    console.warn("No token found");
+    redirect("/redirect/reset-cookie", RedirectType.replace);
+    }
+  try{
+    return await uploadCarImage(id, image, token);
+  } catch (error: any) {
+    console.warn("Hooks:", error.response.data);
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useUpdateCar(id: number, payload: CreateUpdateCarRequest): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
+  const token = (await getToken()) || "";
+  if (!token) {
+    console.warn("No token found");
+    redirect("/redirect/reset-cookie", RedirectType.replace);
+  }
+  try{
+    return await updateCar(id, payload, token);
+  } catch (error: any) {
+    console.warn("Hooks:", error.response.data);
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+

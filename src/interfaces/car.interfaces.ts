@@ -31,9 +31,8 @@ export interface CarsDetailRequest {
 }
 
 
-export interface CreateCarRequest {
+export interface CreateUpdateCarRequest {
   car_name: string;
-  car_image: string;
   car_color: string;
   police_number: string;
   transmission: string;

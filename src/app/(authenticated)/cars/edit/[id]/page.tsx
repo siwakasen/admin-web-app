@@ -5,12 +5,12 @@ import { useParams, useSearchParams } from "next/navigation";
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { CarsForm } from "@/app/(authenticated)/cars/_components/cars-form";
-import { CarsImageForm } from "@/app/(authenticated)/cars/_components/cars-image-form";
 import { useGetCarDetail, useUpdateCar } from "@/hooks/cars.hook";
 import { toast } from "sonner";
 import { Check, Loader2 } from "lucide-react";
 import { CarsDetailResponse, Car } from "@/interfaces";
 import { TypeCarSchema } from "@/lib/validations/cars.schemas";
+import { CarsImageForm } from "../../_components/cars-image-form";
 
 export default function EditCarPage() {
   const params = useParams();
