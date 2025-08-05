@@ -11,12 +11,7 @@ import { redirect } from "next/navigation";
 import { ToastApi } from "@/lib/helper/toast-api";
 import { toast } from "sonner";
 
-interface EmployeesPageProps {
-  employee?: Employee;
-}
-
-export default function EmployeesPage({ employee }: EmployeesPageProps) {
-  console.log(employee);
+export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refetch, setRefetch] = useState(false);
@@ -73,7 +68,7 @@ export default function EmployeesPage({ employee }: EmployeesPageProps) {
               </div>
               <div>
                 <Button 
-                 onClick={handleCreateEmployee} disabled={employee?.role.id === 2} className="flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
+                 onClick={handleCreateEmployee} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 cursor-pointer" variant="default">
                   <PlusSquare className="h-4 w-4" />
                   <span className="hidden md:block">Create New Employee</span>
                 </Button>

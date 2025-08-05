@@ -25,9 +25,6 @@ export interface TravelPackagesDetailResponse {
   message: string;
 }
 
-export interface TravelPackagesDetailRequest {
-  id: number;
-}
 export interface CreateTravelPackageRequest {
   package_name: string
   description: string

@@ -4,83 +4,84 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent } from "@/components/ui/card";
-import { TravelPackagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-packages-form";
-import { TravelImagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-images-form";
-import { useGetTravelPackagesDetail, useUpdateTravelPackage } from "@/hooks/travel.hook";
+import { CarsForm } from "@/app/(authenticated)/cars/_components/cars-form";
+import { CarsImageForm } from "@/app/(authenticated)/cars/_components/cars-image-form";
+import { useGetCarDetail, useUpdateCar } from "@/hooks/cars.hook";
 import { toast } from "sonner";
 import { Check, Loader2 } from "lucide-react";
-import { UpdateTravelPackageResponse, TravelPackages } from "@/interfaces";
-import { TypeTravelPackageSchema } from "@/lib/validations/travel.schemas";
+import { CarsDetailResponse, Car } from "@/interfaces";
+import { TypeCarSchema } from "@/lib/validations/cars.schemas";
 
-export default function EditTravelPackagePage() {
+export default function EditCarPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const packageId = Number(params.id);
+  const carId = Number(params.id);
   const initialStep = searchParams.get('step') ? Number(searchParams.get('step')) : 1;
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const [packageData, setPackageData] = useState<TravelPackages | null>(null);
+  const [carData, setCarData] = useState<Car | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refetch, setRefetch] = useState(false);
-  // Fetch package data on component mount
+
+  // Fetch car data on component mount
   useEffect(() => {
-    const fetchPackageData = async () => {
+    const fetchCarData = async () => {
       try {
-        const response = await useGetTravelPackagesDetail(packageId);
+        const response = await useGetCarDetail(carId);
         if ('data' in response) {
-          setPackageData(response.data);
+          setCarData(response.data);
         } else {
-          toast.error("Failed to fetch travel package data");
+          toast.error("Failed to fetch car data");
         }
       } catch (error) {
-        console.error("Error fetching package data:", error);
-        toast.error("Failed to fetch travel package data");
+        console.error("Error fetching car data:", error);
+        toast.error("Failed to fetch car data");
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (packageId) {
-      fetchPackageData();
+    if (carId) {
+      fetchCarData();
     }
-  }, [packageId, refetch]);
+  }, [carId, refetch]);
 
-  const handleTravelPackageSubmit = async (data: TypeTravelPackageSchema) => {
+  const handleCarSubmit = async (data: TypeCarSchema) => {
     try {
-      const response: UpdateTravelPackageResponse | {status?: number, errors?: any} 
-      = await useUpdateTravelPackage(packageId, data);
+      const response: CarsDetailResponse | {status?: number, errors?: any} 
+      = await useUpdateCar(carId, data);
       if('errors' in response) {
         if(response.status === 403) {
-          toast.error("You are not authorized to update this travel package");
+          toast.error("You are not authorized to update this car");
         } else {
-          toast.error(response.errors?.message || "Failed to update travel package");
+          toast.error(response.errors?.message || "Failed to update car");
         }
         return;
       } else if('data' in response) {
-        setPackageData(response.data);
+        setCarData(response.data);
         setCurrentStep(2);
         // Update URL to include step parameter
         const url = new URL(window.location.href);
         url.searchParams.set('step', '2');
         window.history.replaceState({}, '', url.toString());
-        toast.success("Travel package updated successfully!");
+        toast.success("Car updated successfully!");
       }        
     } catch (error) {
-      console.error("Error updating travel package:", error);
-      toast.error("Failed to update travel package. Please try again.");
+      console.error("Error updating car:", error);
+      toast.error("Failed to update car. Please try again.");
     }
   };
 
   const steps = [
     {
       id: 1,
-      title: "Package Details",
-      description: "Update travel package information",
+      title: "Car Details",
+      description: "Update car information",
       icon: "1",
     },
     {
       id: 2,
-      title: "Update Images",
-      description: "Update images for your travel package",
+      title: "Update Image",
+      description: "Update image for your car",
       icon: "2",
     },
   ];
@@ -95,7 +96,7 @@ export default function EditTravelPackagePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin" />
-                  <span className="ml-2">Loading travel package data...</span>
+                  <span className="ml-2">Loading car data...</span>
                 </div>
               </CardContent>
             </Card>
@@ -105,7 +106,7 @@ export default function EditTravelPackagePage() {
     );
   }
 
-  if (!packageData) {
+  if (!carData) {
     return (
       <section>
         <HeaderNavigation />
@@ -114,7 +115,7 @@ export default function EditTravelPackagePage() {
             <Card>
               <CardContent className="p-6">
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">Travel package not found</p>
+                  <p className="text-muted-foreground">Car not found</p>
                 </div>
               </CardContent>
             </Card>
@@ -185,25 +186,25 @@ export default function EditTravelPackagePage() {
                 <div>
                   <div className="mb-6">
                     <h1 className="text-2xl font-bold mb-2">
-                      Edit Travel Package
+                      Edit Car
                     </h1>
                     <p className="text-muted-foreground">
-                      Update the details for your travel package.
+                      Update the details for your car.
                     </p>
                   </div>
-                  <TravelPackagesForm 
-                    onNext={handleTravelPackageSubmit} 
-                    initialData={packageData}
+                  <CarsForm 
+                    onNext={handleCarSubmit} 
+                    initialData={carData}
                     isEditing={true}
                   />
                 </div>
               )}
 
-              {currentStep === 2 && packageData && (
-                <TravelImagesForm
-                  packageId={packageId}
+              {currentStep === 2 && carData && (
+                <CarsImageForm
+                  carId={carId}
                   isEditing={true}
-                  existingImages={packageData.images || []}
+                  existingImage={carData.car_image}
                   onBack={() => {
                     setCurrentStep(1);
                     // Update URL to remove step parameter when going back
@@ -220,4 +221,4 @@ export default function EditTravelPackagePage() {
       </div>
     </section>
   );
-}
+} 

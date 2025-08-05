@@ -1,7 +1,6 @@
 "use server";
 import {
   Pagination,
-  TravelPackagesDetailRequest,
   TravelPackagesDetailResponse,
   TravelPackagesResponse,
   CreateTravelPackageRequest,
@@ -10,20 +9,21 @@ import {
   UploadTravelPackageImagesResponse,
   UpdateTravelPackageRequest,
   UpdateTravelPackageResponse,
+  EmployeeResponse,
 } from "@/interfaces";
 import { getToken } from "@/lib/user-provider";
-import { createTravelPackage, deleteTravelPackage, fetchTravelPackages, fetchTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage } from "@/services";
+import { createTravelPackage, deleteTravelPackage, getAllTravelPackages, getTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage, deleteTravelPackageImage } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 export async function useGetTravelPackages(
   pagination: Pagination
 ): Promise<TravelPackagesResponse> {
-  return await fetchTravelPackages(pagination);
+  return await getAllTravelPackages(pagination);
 }
 
 export async function useGetTravelPackagesDetail(
-  pagination: TravelPackagesDetailRequest
+  id: number
 ): Promise<TravelPackagesDetailResponse> {
-  return await fetchTravelPackagesDetail(pagination);
+  return await getTravelPackagesDetail(id);
 }
 
 export async function useCreateTravelPackage(
@@ -95,6 +95,26 @@ export async function useDeleteTravelPackage(
   }
   try {
     return await deleteTravelPackage(packageId, token);
+  } catch (error: any) {
+    console.warn("Hooks:", error.response.data);
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useDeleteTravelPackageImage(
+  packageId: number,
+  imageUrl: string
+): Promise<EmployeeResponse | {status?: number, errors?: any}> {
+  const token = (await getToken()) || "";
+  if (!token) {
+    console.warn("No token found");
+    redirect("/redirect/reset-cookie", RedirectType.replace);
+  }
+  try {
+    return await deleteTravelPackageImage(packageId, imageUrl, token);
   } catch (error: any) {
     console.warn("Hooks:", error.response.data);
     return {

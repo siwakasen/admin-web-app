@@ -4,16 +4,12 @@ import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCreateEmployee } from "@/hooks/employees.hook";
 import { toast } from "sonner";
-import { CreateEmployeeResponse, Employee } from "@/interfaces";
+import { CreateEmployeeResponse } from "@/interfaces";
 import { CreateEmployeeSchemaType } from "@/lib/validations/employees.schemas";
 import { useRouter } from "next/navigation";
 import { CreateEmployeeForm } from "../_components/create-employee-form";
 
-interface CreateEmployeePageProps {
-  employee?: Employee;
-}
-
-export default function CreateEmployeePage({ employee }: CreateEmployeePageProps) {
+export default function CreateEmployeePage() {
   const router = useRouter();
 
   const handleEmployeeSubmit = async (data: CreateEmployeeSchemaType) => {

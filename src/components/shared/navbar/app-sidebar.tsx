@@ -50,11 +50,6 @@ const adminData = {
       url: "/cars",
       icon: Car,
     },
-    {
-      title: "Employees",
-      url: "/employees",
-      icon: IdCardLanyardIcon,
-    },
   ],
   operationals: [
     {

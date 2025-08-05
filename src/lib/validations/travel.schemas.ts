@@ -6,8 +6,8 @@ export const TravelPackageSchema = z.object({
   package_price: z.number().min(1, { message: "Package price is required" }),
   duration: z.number().min(1, { message: "Duration is required" }),
   max_persons: z.number().min(1, { message: "Max persons is required" }),
-  itineraries: z.array(z.string()).min(1, { message: "Itineraries are required" }),
-  includes: z.array(z.string()).min(1, { message: "Includes are required" }),
+  itineraries: z.array(z.string()).min(1, { message: "At least one itinerary item is required" }),
+  includes: z.array(z.string()).min(1, { message: "At least one include item is required" }),
 });
 
 

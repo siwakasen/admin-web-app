@@ -259,7 +259,12 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input placeholder={`Itinerary ${index + 1}`} {...field} />
+                      <Input placeholder={`Itinerary ${index + 1}`} {...field} onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addItinerary();
+                        }
+                      }} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -305,7 +310,12 @@ export function TravelPackagesForm({ onNext, initialData, isEditing = false }: T
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input placeholder={`Include ${index + 1}`} {...field} />
+                      <Input placeholder={`Include ${index + 1}`} {...field} onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addInclude();
+                        }
+                      }} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

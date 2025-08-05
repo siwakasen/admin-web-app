@@ -12,11 +12,9 @@ import { UpdateEmployeeResponse, Employee } from "@/interfaces";
 import { UpdateEmployeeSchemaType } from "@/lib/validations/employees.schemas";
 import { useRouter } from "next/navigation";
 
-interface EditEmployeePageProps {
-  employee?: Employee;
-}
 
-export default function EditEmployeePage({ employee }: EditEmployeePageProps) {
+
+export default function EditEmployeePage() {
   const params = useParams();
   const router = useRouter();
   const employeeId = Number(params.id);

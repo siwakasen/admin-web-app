@@ -4,15 +4,15 @@ import {
   TravelPackagesDetailResponse,
   CreateTravelPackageRequest,
   CreateTravelPackageResponse,
-  TravelPackagesDetailRequest,
   UploadTravelPackageImagesResponse,
   UpdateTravelPackageRequest,
   UpdateTravelPackageResponse,
+  EmployeeResponse,
 } from "@/interfaces";
 import { createApiInstance } from "../api";
 import { AxiosResponse } from "axios";
 
-export async function fetchTravelPackages(
+export async function getAllTravelPackages(
   pagination: Pagination
 ): Promise<TravelPackagesResponse> {
   try {
@@ -33,14 +33,15 @@ export async function fetchTravelPackages(
   }
 }
 
-export async function fetchTravelPackagesDetail(
-  payload: TravelPackagesDetailRequest
+export async function getTravelPackagesDetail(
+  id: number
 ): Promise<TravelPackagesDetailResponse> {
+  
   const api = await createApiInstance(
     process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
   );
   const response: AxiosResponse = await api.get(
-    `/travel-packages/${payload.id}`
+    `/travel-packages/${id}`
   );
   if (response.status !== 200) {
     throw new Error("Failed to fetch travel packages detail");
@@ -116,6 +117,28 @@ export async function deleteTravelPackage(
     {
       headers: {
         Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function deleteTravelPackageImage(
+  packageId: number,
+  imageUrl: string,
+  token: string
+): Promise<EmployeeResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+  );
+  const response: AxiosResponse = await api.delete(
+    `/travel-packages/delete-images/${packageId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        imagePath: imageUrl,
       },
     }
   );

@@ -30,6 +30,10 @@ interface EditEmployeeFormProps {
 
 const roles = [
   {
+    id: 1,
+    name: "Owner",
+  },
+  {
     id: 2,
     name: "Admin",
   },

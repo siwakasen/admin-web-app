@@ -31,6 +31,7 @@ import {
   Edit,
   Trash2,
   MoreVertical,
+  Car,
 } from "lucide-react";
 import {
   Dialog,
@@ -38,8 +39,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -48,32 +49,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { DeleteTravelPackageResponse, TravelPackages } from "@/interfaces/travel.interface";
+import { Car as CarInterface } from "@/interfaces";
 import { Meta } from "@/interfaces";
 import Image from "next/image";
-import { useDeleteTravelPackage } from "@/hooks/travel.hook";
+import { useDeleteCar } from "@/hooks/cars.hook";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
-import { convertTravelImageUrl } from "@/lib/helper/images-url";
+import { convertCarImageUrl } from "@/lib/helper/images-url";
 
-interface TravelPackagesTableProps {
-  packages: TravelPackages[];
+interface CarsTableProps {
+  cars: CarInterface[];
   meta: Meta;
   loading: boolean;
   onPageChange: (page: number) => void;
   onRefetch: () => void;
 }
 
-export function TravelPackagesTable({
-  packages,
+export function CarsTable({
+  cars,
   meta,
   loading,
   onPageChange,
   onRefetch,
-}: TravelPackagesTableProps) {
+}: CarsTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [packageToDelete, setPackageToDelete] = useState<TravelPackages | null>(null);
+  const [carToDelete, setCarToDelete] = useState<CarInterface | null>(null);
+
   const toggleRowExpansion = (id: number) => {
     const newExpanded = new Set(expandedRows);
     if (newExpanded.has(id)) {
@@ -84,39 +86,35 @@ export function TravelPackagesTable({
     setExpandedRows(newExpanded);
   };
 
-  const handleDeleteClick = (pkg: TravelPackages) => {
-    setPackageToDelete(pkg);
+  const handleDeleteClick = (car: CarInterface) => {
+    setCarToDelete(car);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!packageToDelete) return;
+    if (!carToDelete) return;
     
     try {
-      const response: DeleteTravelPackageResponse | {status?: number, errors?: any} = await useDeleteTravelPackage(packageToDelete.id);
-      if('errors' in response) {
-        toast.error(response.errors?.message || "Failed to delete travel package");
-      } else if('data' in response) {
-        toast.success("Travel package deleted successfully!");
-        onRefetch();
-      }
+      const response = await useDeleteCar(carToDelete.id);
+      toast.success("Car deleted successfully!");
+      onRefetch();
     } catch (error) {
-      console.error("Error deleting travel package:", error);
-      toast.error("Failed to delete travel package. Please try again.");
+      console.error("Error deleting car:", error);
+      toast.error("Failed to delete car. Please try again.");
     } finally {
       setDeleteDialogOpen(false);
-      setPackageToDelete(null);
+      setCarToDelete(null);
     }
   };
 
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
-    setPackageToDelete(null);
+    setCarToDelete(null);
   };
 
   const handleEdit = (id: number) => {
-    redirect(`/travel-packages/edit/${id}`);
-  }
+    redirect(`/cars/edit/${id}`);
+  };
 
   const truncateDescription = (description: string, maxWords: number = 8) => {
     const words = description.split(' ');
@@ -154,33 +152,33 @@ export function TravelPackagesTable({
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead className="w-[80px]">ID</TableHead>
-              <TableHead>Package Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Duration</TableHead>
+              <TableHead>Car Name</TableHead>
+              <TableHead>Price/Day</TableHead>
               <TableHead>Max Persons</TableHead>
-              <TableHead>Images</TableHead>
-                <TableHead className="text-right w-[120px]">Actions</TableHead>
+              <TableHead>Transmission</TableHead>
+              <TableHead>Police Number</TableHead>
+              <TableHead className="text-right w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {packages.length === 0 ? (
+            {cars.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
-                  No travel packages found.
+                <TableCell colSpan={8} className="text-center py-8">
+                  No cars found.
                 </TableCell>
               </TableRow>
             ) : (
-              packages.map((pkg) => (
-                <React.Fragment key={pkg.id}>
-                  <TableRow className="hover:bg-muted/50 cursor-pointer" >
+              cars.map((car) => (
+                <React.Fragment key={car.id}>
+                  <TableRow className="hover:bg-muted/50 ">
                     <TableCell>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => toggleRowExpansion(pkg.id)}
+                        onClick={() => toggleRowExpansion(car.id)}
                         className="cursor-pointer"
                       >
-                        {expandedRows.has(pkg.id) ? (
+                        {expandedRows.has(car.id) ? (
                           <ChevronUp className="h-4 w-4" />
                         ) : (
                           <ChevronDown className="h-4 w-4" />
@@ -188,13 +186,13 @@ export function TravelPackagesTable({
                       </Button>
                     </TableCell>
                     <TableCell className="font-mono text-sm">
-                      #{pkg.id}
+                      #{car.id}
                     </TableCell>
                     <TableCell className="font-medium">
                       <div>
-                        <div className="font-semibold">{pkg.package_name}</div>
+                        <div className="font-semibold">{car.car_name}</div>
                         <div className="text-sm text-muted-foreground">
-                          {truncateDescription(pkg.description)}
+                          {truncateDescription(car.description)}
                         </div>
                       </div>
                     </TableCell>
@@ -202,99 +200,94 @@ export function TravelPackagesTable({
                       <div className="flex items-center gap-1">
                         <DollarSign className="h-4 w-4 text-green-600" />
                         <span className="font-semibold text-green-600">
-                          {formatPrice(pkg.package_price)}
+                          {formatPrice(car.price_per_day)}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4 text-blue-600" />
-                        <span>{pkg.duration} hours</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-purple-600" />
-                        <span>{pkg.max_persons}</span>
+                        <span>{car.max_persons}</span>
                       </div>
                     </TableCell>
                     <TableCell>
+                      <Badge variant="outline">
+                        {car.transmission}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-1">
-                        <ImageIcon className="h-4 w-4 text-orange-600" />
-                        <Badge variant="secondary">
-                          {pkg.images?.length} images
-                        </Badge>
+                        <Car className="h-4 w-4 text-blue-600" />
+                        <span className="font-mono text-sm">{car.police_number}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right w-[120px]">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-2xl max-h-[80vh]">
-                                <DialogHeader>
-                                  <DialogTitle>{pkg.package_name}</DialogTitle>
-                                  <DialogDescription>
-                                    View detailed information about this travel package.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <ScrollArea className="max-h-[60vh]">
-                                  <PackageDetails package={pkg} />
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                            
-                            <DropdownMenuItem onClick={() => handleEdit(pkg.id)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteClick(pkg)}>
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                View
+                              </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[80vh]">
+                              <DialogHeader>
+                                <DialogTitle>{car.car_name}</DialogTitle>
+                                <DialogDescription>
+                                  View detailed information about this car.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <ScrollArea className="max-h-[60vh]">
+                                <CarDetails car={car} />
+                              </ScrollArea>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <DropdownMenuItem onClick={() => handleEdit(car.id)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          
+                          <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteClick(car)}>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
-                  {expandedRows.has(pkg.id) && (
+                  {expandedRows.has(car.id) && (
                     <TableRow>
-                      <TableCell colSpan={9} className="bg-muted/30">
+                      <TableCell colSpan={8} className="bg-muted/30">
                         <Card className="border-0 shadow-none">
                           <CardContent className="pt-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <h4 className="font-semibold mb-2">
-                                  Itineraries
+                                  Car Details
                                 </h4>
-                                <ul className="space-y-1">
-                                  {pkg.itineraries.map((item, index) => (
-                                    <li
-                                      key={index}
-                                      className="text-sm flex items-start gap-2"
-                                    >
-                                      <span className="text-muted-foreground">
-                                        •
-                                      </span>
-                                      {item}
-                                    </li>
-                                  ))}
-                                </ul>
+                                <div className="space-y-2 text-sm">
+                                  <div>
+                                    <span className="font-medium">Color:</span> {car.car_color}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Police Number:</span> {car.police_number}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Transmission:</span> {car.transmission}
+                                  </div>
+                                </div>
                               </div>
                               <div>
                                 <h4 className="font-semibold mb-2">Includes</h4>
                                 <div className="flex flex-wrap gap-1">
-                                  {pkg.includes.map((item, index) => (
+                                  {car.includes.map((item, index) => (
                                     <Badge key={index} variant="outline">
                                       {item}
                                     </Badge>
@@ -373,9 +366,9 @@ export function TravelPackagesTable({
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Travel Package</DialogTitle>
+            <DialogTitle>Delete Car</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{packageToDelete?.package_name}"? This action cannot be undone.
+              Are you sure you want to delete "{carToDelete?.car_name}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -392,7 +385,7 @@ export function TravelPackagesTable({
   );
 }
 
-function PackageDetails({ package: pkg }: { package: TravelPackages }) {
+function CarDetails({ car }: { car: CarInterface }) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -413,46 +406,36 @@ function PackageDetails({ package: pkg }: { package: TravelPackages }) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Package Information</h3>
+        <h3 className="text-lg font-semibold mb-2">Car Information</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium">Price:</span>{" "}
-            {formatPrice(pkg.package_price)}
+            <span className="font-medium">Price per Day:</span>{" "}
+            {formatPrice(car.price_per_day)}
           </div>
           <div>
-            <span className="font-medium">Duration:</span> {pkg.duration} days
+            <span className="font-medium">Max Persons:</span> {car.max_persons}
           </div>
           <div>
-            <span className="font-medium">Max Persons:</span> {pkg.max_persons}
+            <span className="font-medium">Color:</span> {car.car_color}
           </div>
           <div>
-            <span className="font-medium">Images:</span> {pkg.images?.length}{" "}
-            photos
+            <span className="font-medium">Transmission:</span> {car.transmission}
+          </div>
+          <div>
+            <span className="font-medium">Police Number:</span> {car.police_number}
           </div>
         </div>
       </div>
 
       <div>
         <h3 className="text-lg font-semibold mb-2">Description</h3>
-        <p className="text-sm text-muted-foreground">{pkg.description}</p>
+        <p className="text-sm text-muted-foreground">{car.description}</p>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-2">Itinerary</h3>
-        <ul className="space-y-2">
-          {pkg.itineraries.map((item, index) => (
-            <li key={index} className="text-sm flex items-start gap-2">
-              <span className="font-medium text-primary">{index + 1}.</span>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Package Includes</h3>
+        <h3 className="text-lg font-semibold mb-2">Car Includes</h3>
         <div className="flex flex-wrap gap-2">
-          {pkg.includes.map((item, index) => (
+          {car.includes.map((item, index) => (
             <Badge key={index} variant="secondary">
               {item}
             </Badge>
@@ -460,29 +443,30 @@ function PackageDetails({ package: pkg }: { package: TravelPackages }) {
         </div>
       </div>
 
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Images</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {pkg.images?.map((image, index) => (
-            <div
-              key={index}
-              className="aspect-video bg-muted rounded-lg  flex items-center justify-center"
-            >
-              <Image src={convertTravelImageUrl(image)} alt="Travel Package Image" width={100} height={100} className="object-cover rounded-lg w-full h-auto" />
-            </div>
-          ))}
+      {car.car_image && (
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Car Image</h3>
+          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+            <Image 
+              src={convertCarImageUrl(car.car_image)} 
+              alt="Car Image" 
+              width={450} 
+              height={300} 
+              className="object-cover rounded-lg" 
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="pt-4 border-t">
         <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
           <div>
             <span className="font-medium">Created:</span>{" "}
-            {formatDate(pkg.created_at)}
+            {formatDate(car.created_at)}
           </div>
           <div>
             <span className="font-medium">Updated:</span>{" "}
-            {formatDate(pkg.updated_at)}
+            {formatDate(car.updated_at)}
           </div>
         </div>
       </div>

@@ -3,23 +3,35 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useUploadTravelPackageImages } from "@/hooks/travel.hook";
+import { useDeleteTravelPackageImage, useUploadTravelPackageImages } from "@/hooks/travel.hook";
 import { convertTravelImageUrl } from "@/lib/helper/images-url";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface TravelImagesFormProps {
   packageId: number;
   onBack?: () => void;
   isEditing?: boolean;
   existingImages?: string[];
+  onRefetch: () => void;
 }
 
-export function TravelImagesForm({ packageId, onBack, isEditing = false, existingImages = [] }: TravelImagesFormProps) {
+export function TravelImagesForm({ packageId, onBack, isEditing = false, existingImages = [], onRefetch }: TravelImagesFormProps) {
   const [images, setImages] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const router = useRouter();
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -91,6 +103,36 @@ export function TravelImagesForm({ packageId, onBack, isEditing = false, existin
     }
   };
 
+  const handleDeleteImage = (imageUrl: string) => {
+    setImageToDelete(imageUrl);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteImage = async () => {
+    if (!imageToDelete) return;
+
+    try {
+      const response = await useDeleteTravelPackageImage(packageId, imageToDelete);
+      if('errors' in response) {
+        toast.error(response.errors?.message || "Failed to delete image");
+        return;
+      } else if('data' in response) {
+        toast.success("Image deleted successfully!");
+      }
+      setDeleteDialogOpen(false);
+      setImageToDelete(null);
+      onRefetch();
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast.error("Failed to delete image. Please try again.");
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setImageToDelete(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -119,6 +161,17 @@ export function TravelImagesForm({ packageId, onBack, isEditing = false, existin
                       alt={`Existing Image ${index + 1}`}
                       className="w-full h-32 object-cover"
                     />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteImage(imageUrl)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
                 <p className="text-xs text-muted-foreground mt-1 truncate">
@@ -129,6 +182,26 @@ export function TravelImagesForm({ packageId, onBack, isEditing = false, existin
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Image</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this image? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={cancelDelete}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteImage}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardContent className="p-6">

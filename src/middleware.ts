@@ -5,7 +5,7 @@ import { useGetEmployee } from "./hooks/employees.hook";
 
 export async function middleware(request: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("session")?.value;
+  const token = cookieStore.get("token")?.value;
   const { employee } = await useGetEmployee();  
   // Redirect authenticated users away from login page
   if (
@@ -34,10 +34,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if(employee?.role.id === 2 && (
-    request.nextUrl.pathname.startsWith("/employees/edit") 
-    || request.nextUrl.pathname.startsWith("/employees/create") 
+    request.nextUrl.pathname.startsWith("/employees") 
   )) {
-    return NextResponse.redirect(new URL("/employees", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
