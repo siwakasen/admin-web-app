@@ -20,15 +20,17 @@ export async function middleware(request: NextRequest) {
   if (
     !token &&
     (request.nextUrl.pathname === "/dashboard" ||
-      request.nextUrl.pathname.startsWith("/cars") ||
       request.nextUrl.pathname.startsWith("/employees") ||
-      request.nextUrl.pathname.startsWith("/travel"))
+      request.nextUrl.pathname.startsWith("/cars") ||
+      request.nextUrl.pathname.startsWith("/travel")) ||
+      request.nextUrl.pathname.startsWith("/expenses")
   ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
   if(employee?.role.id === 1 && (
     request.nextUrl.pathname.startsWith("/travel-packages") 
     || request.nextUrl.pathname.startsWith("/cars") 
+    || request.nextUrl.pathname.startsWith("/expenses")
   )) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }

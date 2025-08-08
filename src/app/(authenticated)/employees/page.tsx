@@ -6,16 +6,18 @@ import { EmployeesTable } from "./_components/employees-table";
 import { Employee } from "@/interfaces";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusSquare } from "lucide-react";
+import { PlusSquare, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ToastApi } from "@/lib/helper/toast-api";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refetch, setRefetch] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [meta, setMeta] = useState({
     totalItems: 0,
     currentPage: 1,
@@ -33,12 +35,24 @@ export default function EmployeesPage() {
     redirect("/employees/create");
   };
 
+  const handleSearch = () => {
+    setCurrentPage(1); // Reset to first page when searching
+    setRefetch(!refetch);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
       const response = await useGetAllEmployees({
         limit: 10,
         page: currentPage,
+        search: searchQuery,
       });
       if ('data' in response) {
         setEmployees(response.data);
@@ -76,6 +90,26 @@ export default function EmployeesPage() {
             </div>
           </CardHeader>
           <CardContent>
+            <div className="mb-4">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search employees..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="pr-10"
+                />
+                <Button
+                  onClick={handleSearch}
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
             <EmployeesTable
               employees={employees}
               meta={meta}

@@ -1,26 +1,30 @@
 "use client";
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetAllCars } from "@/hooks/cars.hook";
-import { CarsTable } from "./_components/cars-table";
-import { Car } from "@/interfaces";
+import { useGetExpenses } from "@/hooks/expenses.hook";
+import { ExpensesTable } from "./_components/expenses-table";
+import { Expense } from "@/interfaces/expenses.interface";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusSquare, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { Meta } from "@/interfaces";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
-export default function CarsPage() {
-  const [cars, setCars] = useState<Car[]>([]);
+export default function ExpensesPage() {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refetch, setRefetch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [startDate, setStartDate] = useState<string | undefined>();
+  const [endDate, setEndDate] = useState<string | undefined>();
   const [meta, setMeta] = useState({
     totalItems: 0,
     currentPage: 1,
     totalPages: 1,
-    limit: 10,
+    limit: 30,  
     hasNextPage: false,
     hasPrevPage: false,
   });
@@ -29,8 +33,8 @@ export default function CarsPage() {
     setCurrentPage(page);
   };
 
-  const handleCreateCar = () => {
-    redirect("/cars/create");
+  const handleCreateExpense = () => {
+    redirect("/expenses/create");
   };
 
   const handleSearch = () => {
@@ -44,16 +48,35 @@ export default function CarsPage() {
     }
   };
 
+  const handleDateRangeChange = (newStartDate: string | undefined, newEndDate: string | undefined) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+  };
+
+  const handleApplyDateFilter = () => {
+    setCurrentPage(1); // Reset to first page when applying date filter
+    setRefetch(!refetch);
+  };
+
+  const handleClearDateFilter = () => {
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setCurrentPage(1);
+    setRefetch(!refetch);
+  };
+
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
-      const response = await useGetAllCars({
-        limit: 10,
+      const response = await useGetExpenses({
+        limit: 30,
         page: currentPage,
         search: searchQuery,
+        start_date: startDate,
+        end_date: endDate,
       });
-      if (response) {
-        setCars(response.data);
+      if (response && "data" in response) {
+        setExpenses(response.data);
         setMeta(response.meta);
       }
       setLoading(false);
@@ -71,26 +94,26 @@ export default function CarsPage() {
             <div className="flex gap-2 justify-between items-center">
               <div>
                 <CardTitle className="text-2xl font-bold">
-                  Cars
+                  Expenses
                 </CardTitle>
                 <p className="text-muted-foreground">
-                  Manage and view all available cars
+                  Manage and view all expenses
                 </p>
               </div>
               <div>
-                <Button onClick={handleCreateCar} className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
+                <Button onClick={handleCreateExpense} className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
                   <PlusSquare className="h-4 w-4" />
-                  <span className="hidden md:block">Add New Car</span>
+                  <span className="hidden md:block">Add New Expense</span>
                 </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="mb-4">
+            <div className="mb-6 space-y-4">
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="Search cars..."
+                  placeholder="Search expenses..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyPress}
@@ -105,9 +128,17 @@ export default function CarsPage() {
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
+              
+              <DateRangePicker
+                startDate={startDate}
+                endDate={endDate}
+                onDateRangeChange={handleDateRangeChange}
+                onApply={handleApplyDateFilter}
+                onClear={handleClearDateFilter}
+              />
             </div>
-            <CarsTable
-              cars={cars}
+            <ExpensesTable
+              expenses={expenses}
               meta={meta}
               loading={loading}
               onPageChange={handlePageChange}

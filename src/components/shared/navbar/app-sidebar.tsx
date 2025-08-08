@@ -50,6 +50,11 @@ const adminData = {
       url: "/cars",
       icon: Car,
     },
+    {
+      title: "Expenses",
+      url: "/expenses",
+      icon: BanknoteArrowUp,
+    },
   ],
   operationals: [
     {
