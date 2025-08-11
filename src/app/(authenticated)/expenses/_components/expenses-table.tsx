@@ -46,7 +46,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Expense } from "@/interfaces/expenses.interface";
 import { Meta } from "@/interfaces";
 import { useDeleteExpense } from "@/hooks/expenses.hook";

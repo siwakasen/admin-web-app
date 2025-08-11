@@ -113,7 +113,6 @@ export function DateRangePicker({
               
             />
             <div className="flex gap-2 p-3 border-t">
-              
               <Button
                 size="sm"
                 onClick={handleApply}
