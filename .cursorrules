@@ -1,0 +1,6 @@
+# Cursor AI Rules
+# This file configures what the AI assistant should and shouldn't access
+
+# Exclude environment files from AI assistance
+# These files often contain sensitive information like API keys, secrets, etc.
+EXCLUDE_FROM_AI: .env*

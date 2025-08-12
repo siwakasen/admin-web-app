@@ -1,6 +1,6 @@
 "use server";
 import { toast } from "sonner";
-import { createApiInstance } from "../api";
+import { createApiInstance } from "./api";
 import {
   ChangePasswordRequest,
   ChangePasswordResponse,
@@ -56,6 +56,8 @@ export const changePassword = async (
   return response.data;
 };
 
+
+
 export const getAllEmployees = async (token: string, pagination?: Pagination): Promise<GetAllEmployeesResponse> => {
   const api = await createApiInstance(
     process.env.NEXT_PUBLIC_EMPLOYEES_API_URL,
@@ -75,6 +77,15 @@ export const getAllEmployees = async (token: string, pagination?: Pagination): P
   }
   
   const response = await api.get(url);
+  return response.data;
+};
+
+export const getAvailableEmployees = async (token: string): Promise<EmployeeResponse[]> => {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_EMPLOYEES_API_URL,
+    token
+  );
+  const response = await api.get("/employees/available");
   return response.data;
 };
 

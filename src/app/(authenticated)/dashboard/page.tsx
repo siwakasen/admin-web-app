@@ -2,12 +2,17 @@ import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { QuickActions } from "@/components/shared/quick-actions";
 import { useGetEmployee } from "@/hooks/employees.hook";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Clock, Play, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { RedirectType } from "next/navigation";
 
 export default async function Page() {
   const { employee } = await useGetEmployee();
 
   if (!employee) {
-    return null;
+    redirect("/redirect/reset-cookie", RedirectType.replace);
   }
 
   return (
@@ -30,44 +35,8 @@ export default async function Page() {
           <QuickActions employee={employee} />
         </div>
 
-        {/* Dashboard Stats Placeholder */}
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Your recent activities will appear here
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Statistics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Key metrics and statistics
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Notifications</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Important updates and notifications
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Main Content Area */}
-        <div className="bg-muted/50 min-h-[40vh] flex-1 rounded-xl p-6 flex items-center justify-center">
+        <div className="bg-muted/50 min-h-[20dvh] flex-1 rounded-xl p-6 flex items-center justify-center">
           <p className="text-muted-foreground text-center">
             
           </p>

@@ -6,7 +6,7 @@ import {
   ForgetPasswordFormSchemaType,
   LoginFormSchemaType,
 } from "@/lib/validations";
-import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
+import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
@@ -40,6 +40,10 @@ export async function useGetEmployee() {
     }
     const { data } = await getEmployee(token);
 
+    if(!data){
+      redirect("/redirect/reset-cookie", RedirectType.replace);
+    }
+
     return { employee: data };
   } catch (error: any) {
     const message: string = error.message;
@@ -53,6 +57,19 @@ export async function useGetEmployee() {
       redirect("/redirect/reset-cookie", RedirectType.replace);
     }
     return { employee: undefined };
+  }
+}
+
+export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await getAvailableEmployees(token);
+    return response;
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
   }
 }
 

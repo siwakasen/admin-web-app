@@ -1,4 +1,4 @@
-import { createApiInstance } from "../api";
+import { createApiInstance } from "./api";
 import { CreateExpenseRequest, ExpenseDetailResponse, ExpensesResponse, ExpensesPagination } from "@/interfaces/expenses.interface";
 import { AxiosResponse } from "axios";
 
@@ -7,7 +7,8 @@ export async function getExpenses(
   token: string
 ): Promise<ExpensesResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_EXPENSES_API
+    process.env.NEXT_PUBLIC_EXPENSES_API_URL,
+    token
   );
   
   // Build query parameters
@@ -27,11 +28,6 @@ export async function getExpenses(
 
   const response: AxiosResponse = await api.get(
     `/expenses?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }
@@ -41,15 +37,11 @@ export async function getExpenseDetail(
   token: string
 ): Promise<ExpenseDetailResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_EXPENSES_API
+    process.env.NEXT_PUBLIC_EXPENSES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.get(
     `/expenses/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }
@@ -59,16 +51,12 @@ export async function createExpense(
   token: string
 ): Promise<ExpensesResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_EXPENSES_API
+    process.env.NEXT_PUBLIC_EXPENSES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.post(
     `/expenses`,
     payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }
@@ -79,16 +67,12 @@ export async function updateExpense(
   token: string
 ): Promise<ExpensesResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_EXPENSES_API
+    process.env.NEXT_PUBLIC_EXPENSES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.put(
     `/expenses/${id}`,
     payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }
@@ -98,15 +82,11 @@ export async function deleteExpense(
   token: string
 ): Promise<ExpensesResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_EXPENSES_API
+    process.env.NEXT_PUBLIC_EXPENSES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.delete(
     `/expenses/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }

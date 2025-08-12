@@ -9,7 +9,7 @@ import {
   UpdateTravelPackageResponse,
   EmployeeResponse,
 } from "@/interfaces";
-import { createApiInstance } from "../api";
+import { createApiInstance } from "./api";
 import { AxiosResponse } from "axios";
 
 export async function getAllTravelPackages(
@@ -17,7 +17,7 @@ export async function getAllTravelPackages(
 ): Promise<TravelPackagesResponse> {
   try {
     const api = await createApiInstance(
-      process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+      process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL
     );
     const response = await api.get(
       `/travel-packages?limit=${pagination.limit}&page=${
@@ -38,17 +38,13 @@ export async function getAllTravelPackagesHistory(
   token: string
 ): Promise<TravelPackagesResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
+    token
   );
   const response = await api.get(
     `/travel-packages/history?limit=${pagination.limit}&page=${
       pagination.page
     }`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }
@@ -58,7 +54,7 @@ export async function getTravelPackagesDetail(
 ): Promise<TravelPackagesDetailResponse> {
   
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
   );
   const response: AxiosResponse = await api.get(
     `/travel-packages/${id}`
@@ -73,12 +69,10 @@ export async function getTravelPackagesDetail(
 
 export async function createTravelPackage(payload: CreateTravelPackageRequest, token: string): Promise<CreateTravelPackageResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.post("/travel-packages", payload, {
-    headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return response.data;
 }
@@ -89,12 +83,10 @@ export async function updateTravelPackage(
   token: string
 ): Promise<UpdateTravelPackageResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.put(`/travel-packages/${packageId}`, payload, {
-    headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return response.data;
 }
@@ -105,7 +97,8 @@ export async function uploadTravelPackageImages(
   token: string
 ): Promise<UploadTravelPackageImagesResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
+    token
   );
   
   const formData = new FormData();
@@ -118,7 +111,6 @@ export async function uploadTravelPackageImages(
     formData,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
     }
@@ -131,15 +123,11 @@ export async function deleteTravelPackage(
   token: string
 ): Promise<any> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.delete(
     `/travel-packages/${packageId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
   );
   return response.data;
 }
@@ -150,14 +138,12 @@ export async function deleteTravelPackageImage(
   token: string
 ): Promise<EmployeeResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL,
+    token
   );
   const response: AxiosResponse = await api.delete(
     `/travel-packages/delete-images/${packageId}`,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
       data: {
         imagePath: imageUrl,
       },

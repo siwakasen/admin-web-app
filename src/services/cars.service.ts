@@ -1,12 +1,12 @@
 import { CarsDetailResponse, CarsResponse, CreateUpdateCarRequest, Pagination } from "@/interfaces";
-import { createApiInstance } from "../api";
+import { createApiInstance } from "./api";
 import { AxiosResponse } from "axios";
 
 export async function getAllCars(
   pagination: Pagination
 ): Promise<CarsResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL
   );
   try {
       const response: AxiosResponse = await api.get(
@@ -23,16 +23,12 @@ export async function getAllCarsHistory(
   token: string
 ): Promise<CarsResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL,
+    token
   );
   try {
     const response: AxiosResponse = await api.get(
       `/cars/history?limit=${pagination.limit}&page=${pagination.page}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
     );
     return response.data;
   } catch (error) {
@@ -44,7 +40,7 @@ export async function getCarDetail(
   id: number
 ): Promise<CarsDetailResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL
   );
   try {
     const response: AxiosResponse = await api.get(`/cars/${id}`);
@@ -59,7 +55,8 @@ export async function deleteCar(
   token: string
 ): Promise<CarsDetailResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL,
+    token
   );
   const response: AxiosResponse = await api.delete(`/cars/${id}`,{
     headers: {
@@ -71,26 +68,24 @@ export async function deleteCar(
 
 export async function createCar(payload: CreateUpdateCarRequest, token: string): Promise<CarsDetailResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL,
+    token
   );
   
   const response: AxiosResponse = await api.post(`/cars`, payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
   return response.data;
 }
 
 export async function uploadCarImage(id: number, image: File, token: string): Promise<CarsDetailResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL,
+    token
   );
   const formData = new FormData();
   formData.append("image", image);
   const response: AxiosResponse = await api.post(`/cars/upload-image/${id}`, formData, {
     headers: {
-      Authorization: `Bearer ${token}`,
       "Content-Type": "multipart/form-data",
     },
   });
@@ -99,12 +94,10 @@ export async function uploadCarImage(id: number, image: File, token: string): Pr
 
 export async function updateCar(id: number, payload: CreateUpdateCarRequest, token: string): Promise<CarsDetailResponse> {
   const api = await createApiInstance(
-    process.env.NEXT_PUBLIC_CARS_API
+    process.env.NEXT_PUBLIC_CARS_API_URL,
+    token
   );
   const response: AxiosResponse = await api.put(`/cars/${id}`, payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
   return response.data;
 } 

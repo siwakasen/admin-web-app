@@ -1,7 +1,7 @@
 "use server";
 
-import { CreateExpenseRequest, ExpenseDetailResponse, ExpensesPagination, ExpensesResponse } from "@/interfaces/expenses.interface";
-import { createExpense, deleteExpense, getExpenseDetail, getExpenses, updateExpense } from "@/services/expenses/expenses.service";
+import { CreateExpenseRequest, ExpenseDetailResponse, ExpensesPagination, ExpensesResponse } from "@/interfaces";
+import { createExpense, deleteExpense, getExpenseDetail, getExpenses, updateExpense } from "@/services";
 import { getToken } from "@/lib/user-provider";
 import { redirect, RedirectType } from "next/navigation";
 

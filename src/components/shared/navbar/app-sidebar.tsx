@@ -59,7 +59,7 @@ const adminData = {
   operationals: [
     {
       name: "Bookings",
-      url: "/bookings",
+      url: "/booking",
       icon: CalendarCheck,
     },
     {
@@ -86,7 +86,7 @@ const ownerData = {
   operationals: [
     {
       name: "Bookings",
-      url: "/bookings",
+      url: "/booking",
       icon: CalendarCheck,
     },
   ],
