@@ -1,12 +1,21 @@
 "use server";
 
 import { CarsDetailResponse, CarsResponse, CreateUpdateCarRequest, Pagination } from "@/interfaces";
-import { getCarDetail, getAllCars, deleteCar, createCar, updateCar, uploadCarImage } from "@/services";
+import { getCarDetail, getAllCars, deleteCar, createCar, updateCar, uploadCarImage, getAllCarsHistory } from "@/services";
 import { getToken } from "@/lib/user-provider";
 import { redirect, RedirectType } from "next/navigation";
 
 export async function useGetAllCars(pagination: Pagination): Promise<CarsResponse> {
   return await getAllCars(pagination);
+}
+
+export async function useGetAllCarsHistory(pagination: Pagination): Promise<CarsResponse> {
+  const token = (await getToken()) || "";
+  if (!token) {
+    console.warn("No token found");
+    redirect("/redirect/reset-cookie", RedirectType.replace);
+  }
+  return await getAllCarsHistory(pagination, token);
 }
 
 export async function useGetCarDetail(id: number): Promise<CarsDetailResponse> {

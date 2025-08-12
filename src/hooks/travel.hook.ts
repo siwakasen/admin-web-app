@@ -12,12 +12,23 @@ import {
   EmployeeResponse,
 } from "@/interfaces";
 import { getToken } from "@/lib/user-provider";
-import { createTravelPackage, deleteTravelPackage, getAllTravelPackages, getTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage, deleteTravelPackageImage } from "@/services";
+import { createTravelPackage, deleteTravelPackage, getAllTravelPackages, getTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage, deleteTravelPackageImage, getAllTravelPackagesHistory } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 export async function useGetTravelPackages(
   pagination: Pagination
 ): Promise<TravelPackagesResponse> {
   return await getAllTravelPackages(pagination);
+}
+
+export async function useGetTravelPackagesHistory(
+  pagination: Pagination
+): Promise<TravelPackagesResponse> {
+  const token = (await getToken()) || "";
+  if (!token) {
+    console.warn("No token found");
+    redirect("/redirect/reset-cookie", RedirectType.replace);
+  }
+  return await getAllTravelPackagesHistory(pagination, token);
 }
 
 export async function useGetTravelPackagesDetail(

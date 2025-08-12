@@ -33,6 +33,26 @@ export async function getAllTravelPackages(
   }
 }
 
+export async function getAllTravelPackagesHistory(
+  pagination: Pagination,
+  token: string
+): Promise<TravelPackagesResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API
+  );
+  const response = await api.get(
+    `/travel-packages/history?limit=${pagination.limit}&page=${
+      pagination.page
+    }`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
+
 export async function getTravelPackagesDetail(
   id: number
 ): Promise<TravelPackagesDetailResponse> {
@@ -48,6 +68,7 @@ export async function getTravelPackagesDetail(
   }
   return response.data;
 }
+
 
 
 export async function createTravelPackage(payload: CreateTravelPackageRequest, token: string): Promise<CreateTravelPackageResponse> {

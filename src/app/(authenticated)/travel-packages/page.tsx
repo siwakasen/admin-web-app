@@ -1,7 +1,7 @@
 "use client";
 import { HeaderNavigation } from "@/components/shared/navbar/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetTravelPackages } from "@/hooks/travel.hook";
+import { useGetTravelPackages, useGetTravelPackagesHistory } from "@/hooks/travel.hook";
 import { TravelPackagesTable } from "./_components/travel-table";
 import { TravelPackages } from "@/interfaces";
 import { useEffect, useState } from "react";
@@ -12,11 +12,22 @@ import { Input } from "@/components/ui/input";
 
 export default function TravelPackagesPage() {
   const [packages, setPackages] = useState<TravelPackages[]>([]);
+  const [packagesHistory, setPackagesHistory] = useState<TravelPackages[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentPageHistory, setCurrentPageHistory] = useState(1);
   const [refetch, setRefetch] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [meta, setMeta] = useState({
+    totalItems: 0,
+    currentPage: 1,
+    totalPages: 1,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+  const [metaHistory, setMetaHistory] = useState({
     totalItems: 0,
     currentPage: 1,
     totalPages: 1,
@@ -27,6 +38,10 @@ export default function TravelPackagesPage() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handlePageChangeHistory = (page: number) => {
+    setCurrentPageHistory(page);
   };
 
   const handleCreateTravelPackage = () => {
@@ -62,12 +77,27 @@ export default function TravelPackagesPage() {
     fetchData();
   }, [currentPage, refetch]);
 
+  useEffect(() => {
+    setLoadingHistory(true);
+    const fetchData = async () => {
+      const response = await useGetTravelPackagesHistory({
+        limit: 10,
+        page: currentPageHistory,
+      });
+      if (response) {
+        setPackagesHistory(response.data);
+        setMetaHistory(response.meta);
+      }
+      setLoadingHistory(false);
+    };
+    fetchData();
+  }, [currentPageHistory, refetch]);
 
   return (
     <section>
       <HeaderNavigation />
 
-      <div className="flex flex-1 flex-col gap-6 p-6">
+      <div className="flex flex-1 flex-col gap-40 p-6">
         <Card>
           <CardHeader>
             <div className="flex gap-2 justify-between items-center">
@@ -113,6 +143,32 @@ export default function TravelPackagesPage() {
               meta={meta}
               loading={loading}
               onPageChange={handlePageChange}
+              onRefetch={() => setRefetch(!refetch)}
+            />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <div className="flex gap-2 justify-between items-center">
+              <div>
+                <CardTitle className="text-2xl font-bold">
+                  Deleted Travel Packages
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  The data below consists of deleted travel packages. These packages will not be displayed on the main website.
+                </p>
+                <p className="text-muted-foreground">
+                  This information is retained as a history for customer bookings.
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <TravelPackagesTable
+              packages={packagesHistory}
+              meta={metaHistory}
+              loading={loadingHistory}
+              onPageChange={handlePageChangeHistory}
               onRefetch={() => setRefetch(!refetch)}
             />
           </CardContent>

@@ -18,6 +18,28 @@ export async function getAllCars(
   }
 }
 
+export async function getAllCarsHistory(
+  pagination: Pagination,
+  token: string
+): Promise<CarsResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_CARS_API
+  );
+  try {
+    const response: AxiosResponse = await api.get(
+      `/cars/history?limit=${pagination.limit}&page=${pagination.page}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+}
+
 export async function getCarDetail(
   id: number
 ): Promise<CarsDetailResponse> {
