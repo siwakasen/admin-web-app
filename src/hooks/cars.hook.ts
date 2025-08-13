@@ -1,7 +1,7 @@
 "use server";
 
 import { CarsDetailResponse, CarsResponse, CreateUpdateCarRequest, Pagination } from "@/interfaces";
-import { getCarDetail, getAllCars, deleteCar, createCar, updateCar, uploadCarImage, getAllCarsHistory } from "@/services";
+import { getCarDetail, getAllCars, deleteCar, createCar, updateCar, uploadCarImage, getAllCarsHistory, getCarsDetailHistoryById } from "@/services";
 import { getToken } from "@/lib/user-provider";
 import { redirect, RedirectType } from "next/navigation";
 
@@ -21,6 +21,10 @@ export async function useGetAllCarsHistory(pagination: Pagination): Promise<Cars
 export async function useGetCarDetail(id: number): Promise<CarsDetailResponse> {
   return await getCarDetail(id);
 }   
+
+export async function useGetCarsDetailHistoryById(id: number): Promise<CarsDetailResponse> {
+  return await getCarsDetailHistoryById(id);
+}
 
 export async function useDeleteCar(id: number): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";

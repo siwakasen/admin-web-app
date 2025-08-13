@@ -35,6 +35,21 @@ export async function getAllCarsHistory(
     throw error instanceof Error ? error : new Error(String(error));
   }
 }
+export async function getCarsDetailHistoryById(
+  id: number,
+): Promise<CarsDetailResponse> {
+  try {
+    const api = await createApiInstance(process.env.NEXT_PUBLIC_CARS_API_URL);
+    const response = await api.get(`/cars/${id}/history`);
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch car detail");
+    }
+    return response.data;
+  } catch (error) {
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+}
+
 
 export async function getCarDetail(
   id: number

@@ -6,7 +6,7 @@ import {
   ForgetPasswordFormSchemaType,
   LoginFormSchemaType,
 } from "@/lib/validations";
-import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
+import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getAvailableEmployeesByDateRange, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
@@ -64,6 +64,23 @@ export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | {
   try {
     const token = (await getToken()) || "";
     const response = await getAvailableEmployees(token);
+    return response;
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}
+
+export async function useGetAvailableEmployeesByDateRange(
+  startDate: string,
+  endDate: string,
+  roleId?: number
+): Promise<GetAllEmployeesResponse | { status?: number; errors?: any }> {
+  try {
+    const token = (await getToken()) || "";
+    const response = await getAvailableEmployeesByDateRange(token, startDate, endDate, roleId);
     return response;
   } catch (error: any) {
     return {

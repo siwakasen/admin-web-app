@@ -1,55 +1,54 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent } from "@/components/ui/card";
-import { CarsForm } from "../_components/cars-form";
-import { CarsImageForm } from "../_components/cars-image-form";
-import { useCreateCar } from "@/hooks/cars.hook";
-import { toast } from "sonner";
-import { Check } from "lucide-react";
-import { CarsDetailResponse } from "@/interfaces";
-import { TypeCarSchema } from "@/lib/validations/cars.schemas";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent } from '@/components/ui/card';
+import { CarsForm } from '../_components/cars-form';
+import { CarsImageForm } from '../_components/cars-image-form';
+import { useCreateCar } from '@/hooks/cars.hook';
+import { toast } from 'sonner';
+import { Check } from 'lucide-react';
+import { CarsDetailResponse } from '@/interfaces';
+import { TypeCarSchema } from '@/lib/validations/cars.schemas';
+import { useRouter } from 'next/navigation';
 
 export default function CreateCarPage() {
   const currentStep = 1;
   const router = useRouter();
 
   const handleCarSubmit = async (data: TypeCarSchema) => {
-    console.log(data);
     try {
-      const response: CarsDetailResponse | {status?: number, errors?: any} = await useCreateCar(data);
-      console.log(response);
-      if('errors' in response) {
-        if(response.status === 403) {
-          toast.error("You are not authorized to create a car");
+      const response: CarsDetailResponse | { status?: number; errors?: any } =
+        await useCreateCar(data);
+      if ('errors' in response) {
+        if (response.status === 403) {
+          toast.error('You are not authorized to create a car');
         } else {
-          toast.error(response.errors?.message || "Failed to create car");
+          toast.error(response.errors?.message || 'Failed to create car');
         }
         return;
-      } else if('data' in response && 'message' in response) {
+      } else if ('data' in response && 'message' in response) {
         toast.success(response.message);
         router.push(`/cars/edit/${response.data.id}?step=2`);
-      }        
+      }
     } catch (error) {
-      console.error("Error creating car:", error);
-      toast.error("Failed to create car. Please try again.");
+      console.error('Error creating car:', error);
+      toast.error('Failed to create car. Please try again.');
     }
   };
 
   const steps = [
     {
       id: 1,
-      title: "Car Details",
-      description: "Provide car information",
-      icon: "1",
+      title: 'Car Details',
+      description: 'Provide car information',
+      icon: '1',
     },
     {
       id: 2,
-      title: "Upload Image",
-      description: "Add image to your car",
-      icon: "2",
+      title: 'Upload Image',
+      description: 'Add image to your car',
+      icon: '2',
     },
   ];
 
@@ -67,8 +66,8 @@ export default function CreateCarPage() {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                         currentStep >= step.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {currentStep > step.id ? (
@@ -81,8 +80,8 @@ export default function CreateCarPage() {
                       <h3
                         className={`text-sm font-semibold ${
                           currentStep >= step.id
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
                         }`}
                       >
                         {step.title}
@@ -95,9 +94,7 @@ export default function CreateCarPage() {
                   {index < steps.length - 1 && (
                     <div
                       className={`flex-1 h-0.5 mx-4 transition-colors ${
-                        currentStep > step.id
-                          ? "bg-primary"
-                          : "bg-muted"
+                        currentStep > step.id ? 'bg-primary' : 'bg-muted'
                       }`}
                     />
                   )}
@@ -111,9 +108,7 @@ export default function CreateCarPage() {
             <CardContent className="p-6">
               <div>
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold mb-2">
-                    Create New Car
-                  </h1>
+                  <h1 className="text-2xl font-bold mb-2">Create New Car</h1>
                   <p className="text-muted-foreground">
                     Fill in the details for your new car.
                   </p>

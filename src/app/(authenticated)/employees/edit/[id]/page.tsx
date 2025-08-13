@@ -1,18 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent } from "@/components/ui/card";
-import { EditEmployeeForm } from "@/app/(authenticated)/employees/_components/edit-employee-form";
-import { useGetAllEmployees, useGetEmployeeById, useUpdateEmployee } from "@/hooks/employees.hook";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import { UpdateEmployeeResponse, Employee } from "@/interfaces";
-import { UpdateEmployeeSchemaType } from "@/lib/validations/employees.schemas";
-import { useRouter } from "next/navigation";
-
-
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent } from '@/components/ui/card';
+import { EditEmployeeForm } from '@/app/(authenticated)/employees/_components/edit-employee-form';
+import {
+  useGetAllEmployees,
+  useGetEmployeeById,
+  useUpdateEmployee,
+} from '@/hooks/employees.hook';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
+import { UpdateEmployeeResponse, Employee } from '@/interfaces';
+import { UpdateEmployeeSchemaType } from '@/lib/validations/employees.schemas';
+import { useRouter } from 'next/navigation';
 
 export default function EditEmployeePage() {
   const params = useParams();
@@ -29,11 +31,11 @@ export default function EditEmployeePage() {
         if ('data' in response) {
           setEmployeeData(response.data);
         } else {
-          toast.error("Failed to fetch employee data");
+          toast.error('Failed to fetch employee data');
         }
       } catch (error) {
-        console.error("Error fetching employee data:", error);
-        toast.error("Failed to fetch employee data");
+        console.error('Error fetching employee data:', error);
+        toast.error('Failed to fetch employee data');
       } finally {
         setIsLoading(false);
       }
@@ -45,23 +47,27 @@ export default function EditEmployeePage() {
   }, [employeeId]);
 
   const handleEmployeeSubmit = async (data: UpdateEmployeeSchemaType) => {
-    console.log(data);
     try {
-      const response: UpdateEmployeeResponse | {status?: number, errors?: any} = await useUpdateEmployee(employeeId, data);
-      if('errors' in response) {
-        if(response.status === 403) {
-          toast.error("You are not authorized to update this employee");
+      const response:
+        | UpdateEmployeeResponse
+        | { status?: number; errors?: any } = await useUpdateEmployee(
+        employeeId,
+        data,
+      );
+      if ('errors' in response) {
+        if (response.status === 403) {
+          toast.error('You are not authorized to update this employee');
         } else {
-          toast.error(response.errors?.message || "Failed to update employee");
+          toast.error(response.errors?.message || 'Failed to update employee');
         }
         return;
-      } else if('message' in response) {
-        toast.success("Employee updated successfully!");
-        router.push("/employees");
-      }        
+      } else if ('message' in response) {
+        toast.success('Employee updated successfully!');
+        router.push('/employees');
+      }
     } catch (error) {
-      console.error("Error updating employee:", error);
-      toast.error("Failed to update employee. Please try again.");
+      console.error('Error updating employee:', error);
+      toast.error('Failed to update employee. Please try again.');
     }
   };
 
@@ -133,15 +139,13 @@ export default function EditEmployeePage() {
             <CardContent className="p-6">
               <div>
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold mb-2">
-                    Edit Employee
-                  </h1>
+                  <h1 className="text-2xl font-bold mb-2">Edit Employee</h1>
                   <p className="text-muted-foreground">
                     Update the details for employee: {employeeData.name}
                   </p>
                 </div>
-                <EditEmployeeForm 
-                  onNext={handleEmployeeSubmit} 
+                <EditEmployeeForm
+                  onNext={handleEmployeeSubmit}
                   initialData={employeeData}
                 />
               </div>

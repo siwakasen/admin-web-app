@@ -32,7 +32,7 @@ export async function assignBookingToEmployee(
   );
 
   const response: AxiosResponse = await api.patch(
-    `/bookings/assign/${bookingId}`,
+    `/bookings/assign-employee/${bookingId}`,
     {
       employee_id: employeeId,
     },
@@ -70,6 +70,19 @@ export async function finishBooking(
       status: bookingStatus,
     },
   );
+  return response.data;
+}
+
+export async function getBookingById(
+  bookingId: number,
+  token: string
+): Promise<BookingResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_BOOKINGS_API_URL,
+    token
+  );
+
+  const response: AxiosResponse = await api.get(`/bookings/emp/${bookingId}`);
   return response.data;
 }
 

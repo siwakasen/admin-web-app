@@ -12,7 +12,7 @@ import {
   EmployeeResponse,
 } from "@/interfaces";
 import { getToken } from "@/lib/user-provider";
-import { createTravelPackage, deleteTravelPackage, getAllTravelPackages, getTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage, deleteTravelPackageImage, getAllTravelPackagesHistory } from "@/services";
+import { createTravelPackage, deleteTravelPackage, getAllTravelPackages, getTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage, deleteTravelPackageImage, getAllTravelPackagesHistory, getTravelPackagesHistoryById } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 export async function useGetTravelPackages(
   pagination: Pagination
@@ -35,6 +35,12 @@ export async function useGetTravelPackagesDetail(
   id: number
 ): Promise<TravelPackagesDetailResponse> {
   return await getTravelPackagesDetail(id);
+}
+
+export async function useGetTravelPackagesHistoryById(
+  id: number
+): Promise<TravelPackagesDetailResponse> {
+  return await getTravelPackagesHistoryById(id);
 }
 
 export async function useCreateTravelPackage(

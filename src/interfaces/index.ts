@@ -3,4 +3,5 @@ export * from "./common.interface";
 export * from "./travel.interface";
 export * from "./car.interfaces";
 export * from "./expenses.interface";
-export * from "./bookings.interface";
+export * from "./booking.interface";
+export * from "./customers.interface";

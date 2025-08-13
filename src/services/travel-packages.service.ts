@@ -65,7 +65,15 @@ export async function getTravelPackagesDetail(
   return response.data;
 }
 
-
+export async function getTravelPackagesHistoryById(
+  id: number,
+): Promise<TravelPackagesDetailResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_TRAVEL_PACKAGES_API_URL
+  );
+  const response: AxiosResponse = await api.get(`/travel-packages/${id}/history`);
+  return response.data;
+}
 
 export async function createTravelPackage(payload: CreateTravelPackageRequest, token: string): Promise<CreateTravelPackageResponse> {
   const api = await createApiInstance(

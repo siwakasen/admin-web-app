@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -8,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Pagination,
   PaginationContent,
@@ -16,17 +17,17 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Eye,
   User,
@@ -37,12 +38,12 @@ import {
   MoreVertical,
   MapPin,
   Clock,
-  Car,
-  Package,
+  Car as CarIcon,
+  Palmtree,
   CheckCircle,
   XCircle,
   Users,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -51,18 +52,19 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Booking, BookingStatus } from "@/interfaces/booking.interface";
-import { Meta } from "@/interfaces/common.interface";
-import { useFinishBooking } from "@/hooks/booking.hook";
-import { toast } from "sonner";
+} from '@/components/ui/dropdown-menu';
+import { Booking, BookingStatus } from '@/interfaces/booking.interface';
+import { Meta } from '@/interfaces/common.interface';
+import { TravelPackages } from '@/interfaces/travel.interface';
+import { Car } from '@/interfaces/car.interfaces';
+import { useFinishBooking } from '@/hooks/booking.hook';
+import { toast } from 'sonner';
 
 interface BookingTableProps {
   bookings: Booking[];
@@ -72,6 +74,9 @@ interface BookingTableProps {
   onRefetch: () => void;
   statusFilter: string;
   onStatusFilterChange: (status: string) => void;
+  travelPackages: TravelPackages[];
+  cars: Car[];
+  servicesLoading: boolean;
 }
 
 export function BookingTable({
@@ -82,11 +87,42 @@ export function BookingTable({
   onRefetch,
   statusFilter,
   onStatusFilterChange,
+  travelPackages,
+  cars,
+  servicesLoading,
 }: BookingTableProps) {
+  const router = useRouter();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [bookingToFinish, setBookingToFinish] = useState<Booking | null>(null);
-  const [finishStatus, setFinishStatus] = useState<BookingStatus.COMPLETED | BookingStatus.NO_SHOW>(BookingStatus.COMPLETED);
+  const [finishStatus, setFinishStatus] = useState<
+    BookingStatus.COMPLETED | BookingStatus.NO_SHOW
+  >(BookingStatus.COMPLETED);
+  // Helper function to get service name by ID
+  const getServiceName = (packageId?: number, carId?: number) => {
+    if (packageId) {
+      const travelPackage = travelPackages.find((pkg) => pkg.id === packageId);
+      return travelPackage
+        ? travelPackage.package_name
+        : `Package #${packageId}`;
+    }
+    if (carId) {
+      const car = cars.find((c) => c.id === carId);
+      return car ? car.car_name : `Car #${carId}`;
+    }
+    return 'No service';
+  };
+
+  // Helper function to get service icon and color
+  const getServiceIcon = (packageId?: number, carId?: number) => {
+    if (packageId) {
+      return { icon: Palmtree, color: 'text-green-600' };
+    }
+    if (carId) {
+      return { icon: CarIcon, color: 'text-blue-600' };
+    }
+    return { icon: Palmtree, color: 'text-gray-600' };
+  };
 
   const toggleRowExpansion = (id: number) => {
     const newExpanded = new Set(expandedRows);
@@ -103,20 +139,28 @@ export function BookingTable({
     setFinishDialogOpen(true);
   };
 
+  const handleConfirmClick = (booking: Booking) => {
+    router.push(`/booking/confirmation/${booking.id}`);
+  };
+
+  const handleViewDetails = (id: number) => {
+    router.push(`/booking/details/${id}`);
+  };
+
   const handleFinishConfirm = async () => {
     if (!bookingToFinish) return;
-    
+
     try {
       const response = await useFinishBooking(bookingToFinish.id, finishStatus);
       if ('errors' in response) {
-        toast.error(response.errors.message || "Failed to finish booking");
+        toast.error(response.errors.message || 'Failed to finish booking');
       } else if ('message' in response) {
-        toast.success(response.message || "Booking finished successfully!");
+        toast.success(response.message || 'Booking finished successfully!');
         onRefetch();
       }
     } catch (error) {
-      console.error("Error finishing booking:", error);
-      toast.error("Failed to finish booking. Please try again.");
+      console.error('Error finishing booking:', error);
+      toast.error('Failed to finish booking. Please try again.');
     } finally {
       setFinishDialogOpen(false);
       setBookingToFinish(null);
@@ -131,50 +175,46 @@ export function BookingTable({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(price);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const formatTime = (timeString: string) => {
+    // 13:04:00
+    // Remove the seconds from the time string (e.g., "13:04:00" -> "13:04")
+    return timeString.slice(0, 5);
   };
 
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case BookingStatus.CONFIRMED:
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case BookingStatus.ONGOING:
-        return "bg-cyan-100 text-cyan-800 border-cyan-200";
+        return 'bg-cyan-100 text-cyan-800 border-cyan-200';
       case BookingStatus.COMPLETED:
-        return "bg-green-100 text-green-800 border-green-200";
+        return 'bg-green-100 text-green-800 border-green-200';
       case BookingStatus.CANCELLED:
-        return "bg-red-100 text-red-800 border-red-200";
+        return 'bg-red-100 text-red-800 border-red-200';
       case BookingStatus.WAITING_PAYMENT:
-        return "bg-orange-100 text-orange-800 border-orange-200";
+        return 'bg-orange-100 text-orange-800 border-orange-200';
       case BookingStatus.WAITING_CONFIRMATION:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case BookingStatus.NO_SHOW:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       case BookingStatus.PAYMENT_FAILED:
-        return "bg-red-100 text-red-800 border-red-200";
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -217,9 +257,9 @@ export function BookingTable({
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead className="w-[80px]">ID</TableHead>
-              <TableHead>Customer</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Dates</TableHead>
+              <TableHead>Pickup Time</TableHead>
               <TableHead>Total Price</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right w-[120px]">Actions</TableHead>
@@ -253,26 +293,31 @@ export function BookingTable({
                     <TableCell className="font-mono text-sm">
                       #{booking.id}
                     </TableCell>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-600" />
-                        <span>Customer #{booking.customer_id}</span>
-                      </div>
-                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {booking.package_id ? (
-                          <>
-                            <Package className="h-4 w-4 text-green-600" />
-                            <span className="text-sm">Package #{booking.package_id}</span>
-                          </>
-                        ) : booking.car_id ? (
-                          <>
-                            <Car className="h-4 w-4 text-blue-600" />
-                            <span className="text-sm">Car #{booking.car_id}</span>
-                          </>
+                        {servicesLoading ? (
+                          <span className="text-sm text-muted-foreground">
+                            Loading...
+                          </span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">No service</span>
+                          <>
+                            {(() => {
+                              const { icon: Icon, color } = getServiceIcon(
+                                booking.package_id,
+                                booking.car_id,
+                              );
+                              const serviceName = getServiceName(
+                                booking.package_id,
+                                booking.car_id,
+                              );
+                              return (
+                                <>
+                                  <Icon className={`h-4 w-4 ${color}`} />
+                                  <span className="text-sm">{serviceName}</span>
+                                </>
+                              );
+                            })()}
+                          </>
                         )}
                       </div>
                     </TableCell>
@@ -281,8 +326,18 @@ export function BookingTable({
                         <Calendar className="h-4 w-4 text-green-600" />
                         <div className="text-sm">
                           <div>{formatDate(booking.start_date)}</div>
-                          <div className="text-muted-foreground">to {formatDate(booking.end_date)}</div>
+                          <div className="text-muted-foreground">
+                            to {formatDate(booking.end_date)}
+                          </div>
                         </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4 text-green-600" />
+                        <span className="font-semibold text-green-600">
+                          {formatTime(booking.pickup_time)}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -294,7 +349,7 @@ export function BookingTable({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant="outline"
                         className={getStatusBadgeClass(booking.status)}
                       >
@@ -304,34 +359,35 @@ export function BookingTable({
                     <TableCell className="text-right w-[120px]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 cursor-pointer"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                View Details
-                              </DropdownMenuItem>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[80vh]">
-                              <DialogHeader>
-                                <DialogTitle>Booking Details #{booking.id}</DialogTitle>
-                                <DialogDescription>
-                                  View detailed information about this booking.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <ScrollArea className="max-h-[60vh]">
-                                <BookingDetails booking={booking} />
-                              </ScrollArea>
-                            </DialogContent>
-                          </Dialog>
-                          
+                          <DropdownMenuItem
+                            onClick={() => handleViewDetails(booking.id)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+
+                          {booking.status ===
+                            BookingStatus.WAITING_CONFIRMATION && (
+                            <DropdownMenuItem
+                              className="text-green-600 focus:text-green-600"
+                              onClick={() => handleConfirmClick(booking)}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Confirm Booking
+                            </DropdownMenuItem>
+                          )}
                           {booking.status === BookingStatus.ONGOING && (
-                            <DropdownMenuItem 
-                              className="text-green-600 focus:text-green-600" 
+                            <DropdownMenuItem
+                              className="text-green-600 focus:text-green-600"
                               onClick={() => handleFinishClick(booking)}
                             >
                               <CheckCircle className="h-4 w-4 mr-2" />
@@ -349,7 +405,9 @@ export function BookingTable({
                           <CardContent className="pt-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
-                                <h4 className="font-semibold mb-2">Pickup Information</h4>
+                                <h4 className="font-semibold mb-2">
+                                  Pickup Information
+                                </h4>
                                 <div className="space-y-2 text-sm">
                                   <div className="flex items-center gap-2">
                                     <MapPin className="h-4 w-4 text-red-600" />
@@ -362,28 +420,41 @@ export function BookingTable({
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-semibold mb-2">Booking Info</h4>
+                                <h4 className="font-semibold mb-2">
+                                  Booking Info
+                                </h4>
                                 <div className="space-y-2 text-sm">
                                   <div>
-                                    <span className="font-medium">With Driver:</span> {booking.with_driver ? "Yes" : "No"}
+                                    <span className="font-medium">
+                                      With Driver:
+                                    </span>{' '}
+                                    {booking.with_driver ? 'Yes' : 'No'}
                                   </div>
                                   {booking.number_of_persons && (
                                     <div className="flex items-center gap-2">
                                       <Users className="h-4 w-4 text-green-600" />
-                                      <span>{booking.number_of_persons} persons</span>
+                                      <span>
+                                        {booking.number_of_persons} persons
+                                      </span>
                                     </div>
                                   )}
                                   {booking.employee_id && (
                                     <div>
-                                      <span className="font-medium">Employee:</span> #{booking.employee_id}
+                                      <span className="font-medium">
+                                        Employee:
+                                      </span>{' '}
+                                      #{booking.employee_id}
                                     </div>
                                   )}
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-semibold mb-2">Additional Notes</h4>
+                                <h4 className="font-semibold mb-2">
+                                  Additional Notes
+                                </h4>
                                 <p className="text-sm text-muted-foreground">
-                                  {booking.additional_notes || "No additional notes"}
+                                  {booking.additional_notes ||
+                                    'No additional notes'}
                                 </p>
                               </div>
                             </div>
@@ -403,8 +474,8 @@ export function BookingTable({
       {meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {(meta.currentPage - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{" "}
+            Showing {(meta.currentPage - 1) * meta.limit + 1} to{' '}
+            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{' '}
             {meta.totalItems} results
           </div>
           <Pagination>
@@ -416,8 +487,8 @@ export function BookingTable({
                   }
                   className={
                     !meta.hasPrevPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -444,8 +515,8 @@ export function BookingTable({
                   }
                   className={
                     !meta.hasNextPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -465,10 +536,16 @@ export function BookingTable({
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select finish status:</label>
+              <label className="text-sm font-medium">
+                Select finish status:
+              </label>
               <Select
                 value={finishStatus}
-                onValueChange={(value) => setFinishStatus(value as BookingStatus.COMPLETED | BookingStatus.NO_SHOW)}
+                onValueChange={(value) =>
+                  setFinishStatus(
+                    value as BookingStatus.COMPLETED | BookingStatus.NO_SHOW,
+                  )
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -494,141 +571,10 @@ export function BookingTable({
             <Button variant="outline" onClick={handleFinishCancel}>
               Cancel
             </Button>
-            <Button onClick={handleFinishConfirm}>
-              Finish Booking
-            </Button>
+            <Button onClick={handleFinishConfirm}>Finish Booking</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-function BookingDetails({ booking }: { booking: Booking }) {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Booking Information</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="font-medium">Customer ID:</span> #{booking.customer_id}
-          </div>
-          <div>
-            <span className="font-medium">Employee ID:</span> {booking.employee_id ? `#${booking.employee_id}` : "Not assigned"}
-          </div>
-          <div>
-            <span className="font-medium">Total Price:</span> {formatPrice(booking.total_price)}
-          </div>
-          <div>
-            <span className="font-medium">Status:</span> {booking.status.replace(/_/g, ' ')}
-          </div>
-          <div>
-            <span className="font-medium">With Driver:</span> {booking.with_driver ? "Yes" : "No"}
-          </div>
-          {booking.number_of_persons && (
-            <div>
-              <span className="font-medium">Number of Persons:</span> {booking.number_of_persons}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Service Details</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          {booking.package_id && (
-            <div>
-              <span className="font-medium">Package ID:</span> #{booking.package_id}
-            </div>
-          )}
-          {booking.car_id && (
-            <div>
-              <span className="font-medium">Car ID:</span> #{booking.car_id}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Schedule & Location</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="font-medium">Start Date:</span> {formatDateTime(booking.start_date)}
-          </div>
-          <div>
-            <span className="font-medium">End Date:</span> {formatDateTime(booking.end_date)}
-          </div>
-          <div>
-            <span className="font-medium">Pickup Location:</span> {booking.pickup_location}
-          </div>
-          <div>
-            <span className="font-medium">Pickup Time:</span> {booking.pickup_time}
-          </div>
-        </div>
-      </div>
-
-      {booking.additional_notes && (
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Additional Notes</h3>
-          <p className="text-sm text-muted-foreground">{booking.additional_notes}</p>
-        </div>
-      )}
-
-      {booking.payments && booking.payments.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Payments</h3>
-          <div className="space-y-2">
-            {booking.payments.map((payment, index) => (
-              <div key={payment.id} className="border rounded-lg p-3">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">Payment #{index + 1}:</span> {formatPrice(payment.gross_amount)}
-                  </div>
-                  <div>
-                    <span className="font-medium">Method:</span> {payment.payment_method}
-                  </div>
-                  <div>
-                    <span className="font-medium">Status:</span> {payment.status}
-                  </div>
-                  {payment.payment_date && (
-                    <div>
-                      <span className="font-medium">Date:</span> {formatDateTime(payment.payment_date)}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="pt-4 border-t">
-        <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
-          <div>
-            <span className="font-medium">Created:</span> {formatDateTime(booking.created_at)}
-          </div>
-          <div>
-            <span className="font-medium">Updated:</span> {formatDateTime(booking.updated_at)}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
