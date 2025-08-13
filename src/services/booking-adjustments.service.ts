@@ -1,7 +1,7 @@
 'use server';
 import { Pagination } from "@/interfaces/common.interface";
 import { createApiInstance } from "./api";
-import { AdjustmentStatus, ApprovementCancellationResponse, BookingAdjustmentResponse } from "@/interfaces/booking-adjustments.interface";
+import { AdjustmentStatus, ApprovementCancellationResponse, BookingAdjustmentResponse, RescheduleAdjustmentResponse } from "@/interfaces/booking-adjustments.interface";
 import { AxiosResponse } from "axios";
 
 export async function getAllBookingAdjustments(
@@ -34,6 +34,24 @@ export async function approvementCancellation(
 
   const response: AxiosResponse = await api.patch(`/bookings/aprrovement-cancellation/${id}`, {
     status: status
+  });
+  return response.data;
+}
+
+export async function rescheduleAdjustment(
+  id: number,
+  token: string,
+  status: AdjustmentStatus.APPROVED | AdjustmentStatus.REJECTED,
+  employee_id?: string,
+): Promise<RescheduleAdjustmentResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_BOOKINGS_API_URL,
+    token
+  );
+
+  const response: AxiosResponse = await api.patch(`/bookings/approvement-reschedule/${id}`, {
+    status: status,
+    employee_id: employee_id
   });
   return response.data;
 }

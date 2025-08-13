@@ -19,6 +19,7 @@ export interface BookingAdjustment {
   export enum AdjustmentStatus {
     PENDING = 'PENDING',
     WAITING_PAYMENT = 'WAITING_PAYMENT',
+    WAITING_REASSIGNMENT = 'WAITING_REASSIGNMENT',
     APPROVED = 'APPROVED',
     REJECTED = 'REJECTED',
     EXPIRED = 'EXPIRED'
@@ -45,4 +46,15 @@ export interface BookingAdjustment {
     created_at: string
     updated_at: string
     booking: Booking
+  }
+
+  export interface RescheduleAdjustmentResponse {
+    data: {
+        adjustment: {
+            request_type: RequestType;
+            status: AdjustmentStatus;
+        };
+    };
+
+    message: string
   }

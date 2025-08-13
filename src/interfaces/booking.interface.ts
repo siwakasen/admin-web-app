@@ -48,9 +48,21 @@ import { Meta } from "./common.interface";
     gross_amount: number
     net_amount?: number
     payment_date?: string
-    payment_method: string
+    payment_method: PaymentMethod
     payment_gateway_id: string
-    status: string
+    status: PaymentStatus
     created_at: string
     updated_at: string
   }
+
+  export enum PaymentStatus {
+    PENDING = 'PENDING',
+    SUCCESS = 'SUCCESS',
+    FAILED = 'FAILED'
+  }
+  
+  export enum PaymentMethod {
+    MIDTRANS = 'MIDTRANS',
+    PAYPAL = 'PAYPAL',
+  }
+  

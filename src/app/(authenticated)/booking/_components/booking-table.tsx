@@ -139,10 +139,6 @@ export function BookingTable({
     setFinishDialogOpen(true);
   };
 
-  const handleConfirmClick = (booking: Booking) => {
-    router.push(`/booking/confirmation/${booking.id}`);
-  };
-
   const handleViewDetails = (id: number) => {
     router.push(`/booking/details/${id}`);
   };
@@ -374,17 +370,6 @@ export function BookingTable({
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-
-                          {booking.status ===
-                            BookingStatus.WAITING_CONFIRMATION && (
-                            <DropdownMenuItem
-                              className="text-green-600 focus:text-green-600"
-                              onClick={() => handleConfirmClick(booking)}
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Confirm Booking
-                            </DropdownMenuItem>
-                          )}
                           {booking.status === BookingStatus.ONGOING && (
                             <DropdownMenuItem
                               className="text-green-600 focus:text-green-600"

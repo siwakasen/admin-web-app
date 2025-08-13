@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -39,6 +40,7 @@ import {
   XCircle,
   AlertCircle,
   FileText,
+  User,
 } from 'lucide-react';
 import {
   Dialog,
@@ -60,7 +62,11 @@ import {
   RequestType,
 } from '@/interfaces/booking-adjustments.interface';
 import { Meta } from '@/interfaces/common.interface';
-import { useApprovementCancellation } from '@/hooks/booking-adjustments.hook';
+import {
+  useApprovementCancellation,
+  useRescheduleAdjustment,
+} from '@/hooks/booking-adjustments.hook';
+import { useGetAvailableEmployeesByDateRange } from '@/hooks/employees.hook';
 import { toast } from 'sonner';
 
 interface BookingAdjustmentTableProps {
@@ -88,6 +94,9 @@ export function BookingAdjustmentTable({
   const [adjustmentToProcess, setAdjustmentToProcess] =
     useState<BookingAdjustmentWithBooking | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
+  const [availableEmployees, setAvailableEmployees] = useState<any[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
 
   const toggleRowExpansion = (id: number) => {
     const newExpanded = new Set(expandedRows);
@@ -99,9 +108,39 @@ export function BookingAdjustmentTable({
     setExpandedRows(newExpanded);
   };
 
-  const handleApproveClick = (adjustment: BookingAdjustmentWithBooking) => {
+  const handleApproveClick = async (
+    adjustment: BookingAdjustmentWithBooking
+  ) => {
     setAdjustmentToProcess(adjustment);
     setApproveDialogOpen(true);
+
+    if (adjustment.request_type === RequestType.RESCHEDULE) {
+      setLoadingEmployees(true);
+      try {
+        const startDate =
+          adjustment.new_start_date || adjustment.booking.start_date;
+        const endDate = adjustment.new_end_date || adjustment.booking.end_date;
+
+        const roleId = adjustment.booking.package_id ? 3 : 4;
+
+        const employeesResponse = await useGetAvailableEmployeesByDateRange(
+          startDate,
+          endDate,
+          roleId
+        );
+
+        if ('data' in employeesResponse) {
+          setAvailableEmployees(employeesResponse.data);
+        } else {
+          setAvailableEmployees([]);
+        }
+      } catch (error) {
+        console.error('Error fetching available employees:', error);
+        setAvailableEmployees([]);
+      } finally {
+        setLoadingEmployees(false);
+      }
+    }
   };
 
   const handleRejectClick = (adjustment: BookingAdjustmentWithBooking) => {
@@ -114,14 +153,35 @@ export function BookingAdjustmentTable({
 
     setProcessing(true);
     try {
-      const response = await useApprovementCancellation(
-        adjustmentToProcess.id,
-        AdjustmentStatus.APPROVED,
-      );
-      if ('errors' in response) {
+      let response;
+      if (adjustmentToProcess.request_type === RequestType.CANCELLATION) {
+        response = await useApprovementCancellation(
+          adjustmentToProcess.id,
+          AdjustmentStatus.APPROVED
+        );
+      }
+      if (adjustmentToProcess.request_type === RequestType.RESCHEDULE) {
+        if (
+          !selectedEmployeeId &&
+          ((adjustmentToProcess.booking.car_id &&
+            adjustmentToProcess.booking.with_driver) ||
+            adjustmentToProcess.booking.package_id)
+        ) {
+          toast.error(
+            'Please select an employee before approving the reschedule request'
+          );
+          return;
+        }
+        response = await useRescheduleAdjustment(
+          adjustmentToProcess.id,
+          AdjustmentStatus.APPROVED,
+          selectedEmployeeId
+        );
+      }
+      if (response && 'errors' in response) {
         toast.error(response.errors.message || 'Failed to approve adjustment');
-      } else if ('message' in response) {
-        toast.success(response.message || 'Adjustment approved successfully!');
+      } else if (response && 'message' in response) {
+        toast.success('Adjustment approved successfully!');
         onRefetch();
       }
     } catch (error) {
@@ -139,13 +199,22 @@ export function BookingAdjustmentTable({
 
     setProcessing(true);
     try {
-      const response = await useApprovementCancellation(
-        adjustmentToProcess.id,
-        AdjustmentStatus.REJECTED,
-      );
-      if ('errors' in response) {
+      let response;
+      if (adjustmentToProcess.request_type === RequestType.CANCELLATION) {
+        response = await useApprovementCancellation(
+          adjustmentToProcess.id,
+          AdjustmentStatus.REJECTED
+        );
+      } else if (adjustmentToProcess.request_type === RequestType.RESCHEDULE) {
+        response = await useRescheduleAdjustment(
+          adjustmentToProcess.id,
+          AdjustmentStatus.REJECTED
+        );
+      }
+
+      if (response && 'errors' in response) {
         toast.error(response.errors.message || 'Failed to reject adjustment');
-      } else if ('message' in response) {
+      } else if (response && 'message' in response) {
         toast.success(response.message || 'Adjustment rejected successfully!');
         onRefetch();
       }
@@ -163,6 +232,8 @@ export function BookingAdjustmentTable({
     setApproveDialogOpen(false);
     setRejectDialogOpen(false);
     setAdjustmentToProcess(null);
+    setSelectedEmployeeId('');
+    setAvailableEmployees([]);
   };
 
   const formatPrice = (price: number) => {
@@ -288,7 +359,7 @@ export function BookingAdjustmentTable({
                       <div className="flex items-center gap-2">
                         {(() => {
                           const { icon: Icon, color } = getRequestTypeIcon(
-                            adjustment.request_type,
+                            adjustment.request_type
                           );
                           return (
                             <>
@@ -354,7 +425,9 @@ export function BookingAdjustmentTable({
                             View Details
                           </DropdownMenuItem>
 
-                          {adjustment.status === AdjustmentStatus.PENDING && (
+                          {(adjustment.status === AdjustmentStatus.PENDING ||
+                            adjustment.status ===
+                              AdjustmentStatus.WAITING_REASSIGNMENT) && (
                             <>
                               <DropdownMenuItem
                                 className="text-green-600 focus:text-green-600"
@@ -424,7 +497,7 @@ export function BookingAdjustmentTable({
                                     {formatDate(
                                       adjustment.new_end_date
                                         ? adjustment.new_end_date
-                                        : '',
+                                        : ''
                                     )}
                                   </div>
                                   <div>
@@ -540,7 +613,7 @@ export function BookingAdjustmentTable({
 
       {/* Approve Dialog */}
       <Dialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Approve Adjustment Request</DialogTitle>
             <DialogDescription>
@@ -549,6 +622,87 @@ export function BookingAdjustmentTable({
               {adjustmentToProcess?.request_type?.toLowerCase()} request.
             </DialogDescription>
           </DialogHeader>
+
+          {/* Employee Assignment for Reschedule Requests */}
+          {adjustmentToProcess?.request_type === RequestType.RESCHEDULE &&
+            ((adjustmentToProcess.booking.car_id &&
+              adjustmentToProcess.booking.with_driver) ||
+              adjustmentToProcess.booking.package_id) && (
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="employee-select">
+                    Select{' '}
+                    {adjustmentToProcess.booking.package_id
+                      ? 'Travel Guide'
+                      : 'Driver'}
+                  </Label>
+                  <Select
+                    value={selectedEmployeeId}
+                    onValueChange={setSelectedEmployeeId}
+                  >
+                    <SelectTrigger id="employee-select">
+                      <SelectValue
+                        placeholder={
+                          loadingEmployees
+                            ? 'Loading employees...'
+                            : availableEmployees.length === 0
+                            ? `No available ${
+                                adjustmentToProcess.booking.package_id
+                                  ? 'travel guides'
+                                  : 'drivers'
+                              } for selected dates`
+                            : `Select ${
+                                adjustmentToProcess.booking.package_id
+                                  ? 'travel guide'
+                                  : 'driver'
+                              }`
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {loadingEmployees ? (
+                        <SelectItem value="loading" disabled>
+                          Loading employees...
+                        </SelectItem>
+                      ) : availableEmployees.length === 0 ? (
+                        <SelectItem value="no-employees" disabled>
+                          No available{' '}
+                          {adjustmentToProcess.booking.package_id
+                            ? 'travel guides'
+                            : 'drivers'}{' '}
+                          for selected dates
+                        </SelectItem>
+                      ) : (
+                        availableEmployees.map((emp) => (
+                          <SelectItem key={emp.id} value={emp.id.toString()}>
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4" />
+                              <span>{emp.name}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {emp.role.role_name === 'tour_guide'
+                                  ? 'Travel Guide'
+                                  : 'Driver'}
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {availableEmployees.length === 0 && !loadingEmployees && (
+                    <p className="text-sm text-amber-600 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      No{' '}
+                      {adjustmentToProcess.booking.package_id
+                        ? 'travel guides'
+                        : 'drivers'}{' '}
+                      available for the selected dates
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
           <DialogFooter>
             <Button variant="outline" onClick={handleCancel}>
               Cancel
