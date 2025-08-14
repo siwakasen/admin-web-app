@@ -59,9 +59,9 @@ import Action from './_components/action';
 import IdentityImagesZoom from './_components/identity-images-zoom';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function BookingDetailsPage({ params }: PageProps) {
@@ -87,7 +87,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
   let travelPackage: TravelPackages | null = null;
   if (booking.package_id) {
     const travelPackageResponse = await useGetTravelPackagesHistoryById(
-      booking.package_id,
+      booking.package_id
     );
     if (travelPackageResponse) {
       travelPackage = travelPackageResponse.data;
@@ -125,7 +125,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
       try {
         const response = await useGetCustomersImage(
           booking.customer_id,
-          filename,
+          filename
         );
         if (typeof response === 'string') {
           identityImages.push(response);
@@ -144,7 +144,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
 
   // Determine if we need employee assignment
   const needsEmployeeAssignment = Boolean(
-    booking.package_id || (booking.car_id && booking.with_driver),
+    booking.package_id || (booking.car_id && booking.with_driver)
   );
   const requiredRole = booking.package_id ? 3 : 4; // Role 3 for travel package, Role 4 for driver
 
@@ -154,7 +154,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
     const employeesResponse = await useGetAvailableEmployeesByDateRange(
       booking.start_date,
       booking.end_date,
-      requiredRole,
+      requiredRole
     );
     if (employeesResponse && 'data' in employeesResponse) {
       availableEmployees = employeesResponse.data;
@@ -570,7 +570,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   <span className="text-sm">
                     {booking.payments[0]?.payment_date
                       ? new Date(
-                          booking.payments[0].payment_date,
+                          booking.payments[0].payment_date
                         ).toLocaleString()
                       : 'N/A'}
                   </span>
