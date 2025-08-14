@@ -12,12 +12,9 @@ import { Input } from '@/components/ui/input';
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
-  const [carsHistory, setCarsHistory] = useState<Car[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageHistory, setCurrentPageHistory] = useState(1);
   const [refetch, setRefetch] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [loadingHistory, setLoadingHistory] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [meta, setMeta] = useState({
     totalItems: 0,
@@ -27,20 +24,8 @@ export default function CarsPage() {
     hasNextPage: false,
     hasPrevPage: false,
   });
-  const [metaHistory, setMetaHistory] = useState({
-    totalItems: 0,
-    currentPage: 1,
-    totalPages: 1,
-    limit: 10,
-    hasNextPage: false,
-    hasPrevPage: false,
-  });
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const handlePageChangeHistory = (page: number) => {
-    setCurrentPageHistory(page);
   };
 
   const handleCreateCar = () => {
@@ -74,22 +59,6 @@ export default function CarsPage() {
     };
     fetchData();
   }, [currentPage, refetch]);
-
-  useEffect(() => {
-    setLoadingHistory(true);
-    const fetchData = async () => {
-      const response = await useGetAllCarsHistory({
-        limit: 10,
-        page: currentPageHistory,
-      });
-      if (response) {
-        setCarsHistory(response.data);
-        setMetaHistory(response.meta);
-      }
-      setLoadingHistory(false);
-    };
-    fetchData();
-  }, [currentPageHistory, refetch]);
 
   return (
     <section>
