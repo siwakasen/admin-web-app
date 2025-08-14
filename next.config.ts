@@ -6,7 +6,19 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**.vulpbox.com",
+        hostname: "*.vulpbox.com",
+      },
+      {
+        protocol: "https",
+        hostname: "travel-packages-service.vulpbox.com",
+      },
+      {
+        protocol: "https",
+        hostname: "rent-car-service.vulpbox.com",
+      },
+      {
+        protocol: "https",
+        hostname: "transactions-service.vulpbox.com",
       },
       {
         protocol: "http",
