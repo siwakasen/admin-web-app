@@ -1,14 +1,14 @@
-"use client";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetAllCars, useGetAllCarsHistory } from "@/hooks/cars.hook";
-import { CarsTable } from "./_components/cars-table";
-import { Car } from "@/interfaces";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PlusSquare, Search } from "lucide-react";
-import { redirect } from "next/navigation";
-import { Input } from "@/components/ui/input";
+'use client';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useGetAllCars, useGetAllCarsHistory } from '@/hooks/cars.hook';
+import { CarsTable } from './_components/cars-table';
+import { Car } from '@/interfaces';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { PlusSquare, Search } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { Input } from '@/components/ui/input';
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -18,7 +18,7 @@ export default function CarsPage() {
   const [refetch, setRefetch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [meta, setMeta] = useState({
     totalItems: 0,
     currentPage: 1,
@@ -44,7 +44,7 @@ export default function CarsPage() {
   };
 
   const handleCreateCar = () => {
-    redirect("/cars/create");
+    redirect('/cars/create');
   };
 
   const handleSearch = () => {
@@ -53,7 +53,7 @@ export default function CarsPage() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch();
     }
   };
@@ -100,15 +100,17 @@ export default function CarsPage() {
           <CardHeader>
             <div className="flex gap-2 justify-between items-center">
               <div>
-                <CardTitle className="text-2xl font-bold">
-                  Cars
-                </CardTitle>
+                <CardTitle className="text-2xl font-bold">Cars</CardTitle>
                 <p className="text-muted-foreground">
                   Manage and view all available cars
                 </p>
               </div>
               <div>
-                <Button onClick={handleCreateCar} className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
+                <Button
+                  onClick={handleCreateCar}
+                  className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  variant="default"
+                >
                   <PlusSquare className="h-4 w-4" />
                   <span className="hidden md:block">Add New Car</span>
                 </Button>
@@ -141,32 +143,6 @@ export default function CarsPage() {
               meta={meta}
               loading={loading}
               onPageChange={handlePageChange}
-              onRefetch={() => setRefetch(!refetch)}
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <div className="flex gap-2 justify-between items-center">
-              <div>
-                <CardTitle className="text-2xl font-bold">
-                  Deleted Cars
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  The data below consists of deleted cars. These cars will not be displayed on the main website.
-                </p>
-                <p className="text-muted-foreground">
-                  This information is retained as a history for customer bookings.
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CarsTable
-              cars={carsHistory}
-              meta={metaHistory}
-              loading={loadingHistory}
-              onPageChange={handlePageChangeHistory}
               onRefetch={() => setRefetch(!refetch)}
             />
           </CardContent>

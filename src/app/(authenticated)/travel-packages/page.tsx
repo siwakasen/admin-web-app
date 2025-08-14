@@ -1,14 +1,17 @@
-"use client";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetTravelPackages, useGetTravelPackagesHistory } from "@/hooks/travel.hook";
-import { TravelPackagesTable } from "./_components/travel-table";
-import { TravelPackages } from "@/interfaces";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PlusSquare, Search } from "lucide-react";
-import { redirect } from "next/navigation";
-import { Input } from "@/components/ui/input";
+'use client';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  useGetTravelPackages,
+  useGetTravelPackagesHistory,
+} from '@/hooks/travel.hook';
+import { TravelPackagesTable } from './_components/travel-table';
+import { TravelPackages } from '@/interfaces';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { PlusSquare, Search } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { Input } from '@/components/ui/input';
 
 export default function TravelPackagesPage() {
   const [packages, setPackages] = useState<TravelPackages[]>([]);
@@ -18,7 +21,7 @@ export default function TravelPackagesPage() {
   const [refetch, setRefetch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [meta, setMeta] = useState({
     totalItems: 0,
     currentPage: 1,
@@ -45,7 +48,7 @@ export default function TravelPackagesPage() {
   };
 
   const handleCreateTravelPackage = () => {
-    redirect("/travel-packages/create");
+    redirect('/travel-packages/create');
   };
 
   const handleSearch = () => {
@@ -54,7 +57,7 @@ export default function TravelPackagesPage() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch();
     }
   };
@@ -110,7 +113,11 @@ export default function TravelPackagesPage() {
                 </p>
               </div>
               <div>
-                <Button onClick={handleCreateTravelPackage} className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700" variant="default">
+                <Button
+                  onClick={handleCreateTravelPackage}
+                  className="cursor-pointer flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  variant="default"
+                >
                   <PlusSquare className="h-4 w-4" />
                   <span className="hidden md:block">Create New Package</span>
                 </Button>
@@ -143,32 +150,6 @@ export default function TravelPackagesPage() {
               meta={meta}
               loading={loading}
               onPageChange={handlePageChange}
-              onRefetch={() => setRefetch(!refetch)}
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <div className="flex gap-2 justify-between items-center">
-              <div>
-                <CardTitle className="text-2xl font-bold">
-                  Deleted Travel Packages
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  The data below consists of deleted travel packages. These packages will not be displayed on the main website.
-                </p>
-                <p className="text-muted-foreground">
-                  This information is retained as a history for customer bookings.
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <TravelPackagesTable
-              packages={packagesHistory}
-              meta={metaHistory}
-              loading={loadingHistory}
-              onPageChange={handlePageChangeHistory}
               onRefetch={() => setRefetch(!refetch)}
             />
           </CardContent>

@@ -60,6 +60,20 @@ export async function useGetEmployee() {
   }
 }
 
+export async function useGetEmployeeFromMiddleware() {
+  try {
+    const token = (await getToken()) || "";
+    if (!token) {
+      return { employee: undefined };
+    }
+    const { data } = await getEmployee(token);
+    return { employee: data };
+    
+  } catch (error) {
+    return { employee: undefined };
+  }
+}
+
 export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | { status?: number; errors?: any }> {
   try {
     const token = (await getToken()) || "";

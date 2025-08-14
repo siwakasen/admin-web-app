@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { useGetEmployee } from "./hooks/employees.hook";
+import { useGetEmployee, useGetEmployeeFromMiddleware } from "./hooks/employees.hook";
 
 export async function middleware(request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-  const { employee } = await useGetEmployee();  
-  // Redirect authenticated users away from login page
+  const { employee } = await useGetEmployeeFromMiddleware();  
+
   if (
     token &&
     (request.nextUrl.pathname === "/" ||

@@ -1,17 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Employee } from "@/interfaces";
-import Link from "next/link";
-import { 
-  Car, 
-  MapPin, 
-  Receipt, 
-  UserPlus, 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Employee } from '@/interfaces';
+import Link from 'next/link';
+import {
+  Car,
+  MapPin,
+  Receipt,
+  UserPlus,
   Plus,
   Clock,
   Play,
-  CheckCircle
-} from "lucide-react";
+  CheckCircle,
+  CalendarSync,
+} from 'lucide-react';
 
 interface QuickActionsProps {
   employee: Employee;
@@ -20,7 +21,7 @@ interface QuickActionsProps {
 export function QuickActions({ employee }: QuickActionsProps) {
   // Role ID 1 = Owner (can create employees)
   // Role ID 2 = Admin (can create cars, travel-packages, expenses)
-  
+
   const isOwner = employee.role.id === 1;
   const isAdmin = employee.role.id === 2;
 
@@ -49,7 +50,10 @@ export function QuickActions({ employee }: QuickActionsProps) {
                     <p className="text-sm text-muted-foreground mb-3">
                       Add a new vehicle to your fleet
                     </p>
-                    <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                    <Button
+                      className="w-full group-hover:bg-primary/90 cursor-pointer"
+                      size="sm"
+                    >
                       <Plus className="h-4 w-4" />
                       Add Car
                     </Button>
@@ -70,7 +74,10 @@ export function QuickActions({ employee }: QuickActionsProps) {
                     <p className="text-sm text-muted-foreground mb-3">
                       Design a new travel experience
                     </p>
-                    <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                    <Button
+                      className="w-full group-hover:bg-primary/90 cursor-pointer"
+                      size="sm"
+                    >
                       <Plus className="h-4 w-4" />
                       Add Package
                     </Button>
@@ -79,7 +86,7 @@ export function QuickActions({ employee }: QuickActionsProps) {
               </Link>
 
               {/* Create New Expense */}
-              <Link href="/expenses/create">    
+              <Link href="/expenses/create">
                 <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base">
@@ -91,7 +98,10 @@ export function QuickActions({ employee }: QuickActionsProps) {
                     <p className="text-sm text-muted-foreground mb-3">
                       Record a business expense
                     </p>
-                    <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                    <Button
+                      className="w-full group-hover:bg-primary/90 cursor-pointer"
+                      size="sm"
+                    >
                       <Plus className="h-4 w-4" />
                       Add Expense
                     </Button>
@@ -116,7 +126,10 @@ export function QuickActions({ employee }: QuickActionsProps) {
                     <p className="text-sm text-muted-foreground mb-3">
                       Add a new team member
                     </p>
-                    <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                    <Button
+                      className="w-full group-hover:bg-primary/90 cursor-pointer"
+                      size="sm"
+                    >
                       <Plus className="h-4 w-4" />
                       Add Employee
                     </Button>
@@ -131,7 +144,9 @@ export function QuickActions({ employee }: QuickActionsProps) {
       {/* Booking Status Overview - Admin Only */}
       {isAdmin && (
         <div>
-          <h3 className="text-md font-semibold mb-4">Booking Status Overview</h3>
+          <h3 className="text-md font-semibold mb-4">
+            Booking Status Overview
+          </h3>
           <div className="grid gap-4 md:grid-cols-3">
             <Link href="/booking?status=WAITING_CONFIRMATION">
               <Card className="hover:shadow-md transition-shadow cursor-pointer group">
@@ -145,13 +160,16 @@ export function QuickActions({ employee }: QuickActionsProps) {
                   <p className="text-sm text-muted-foreground mb-3">
                     Check for bookings pending confirmation
                   </p>
-                  <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                  <Button
+                    className="w-full group-hover:bg-primary/90 cursor-pointer"
+                    size="sm"
+                  >
                     View Bookings
                   </Button>
                 </CardContent>
               </Card>
             </Link>
-            
+
             <Link href="/booking?status=ONGOING">
               <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                 <CardHeader className="pb-3">
@@ -164,26 +182,32 @@ export function QuickActions({ employee }: QuickActionsProps) {
                   <p className="text-sm text-muted-foreground mb-3">
                     Check for bookings that need to be completed
                   </p>
-                  <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                  <Button
+                    className="w-full group-hover:bg-primary/90 cursor-pointer"
+                    size="sm"
+                  >
                     View Bookings
                   </Button>
                 </CardContent>
               </Card>
             </Link>
-            
-            <Link href="/booking?status=COMPLETED">
+
+            <Link href="/booking-adjustments">
               <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    Completed
+                    <CalendarSync className="h-5 w-5 text-green-600" />
+                    Rescheduled & Cancellation
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-sm text-muted-foreground mb-3">
                     Check for bookings that have been completed
                   </p>
-                  <Button className="w-full group-hover:bg-primary/90 cursor-pointer" size="sm">
+                  <Button
+                    className="w-full group-hover:bg-primary/90 cursor-pointer"
+                    size="sm"
+                  >
                     View Bookings
                   </Button>
                 </CardContent>

@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "https",
+        hostname: "**.vulpbox.com",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
       },
@@ -23,7 +27,7 @@ const nextConfig: NextConfig = {
   experimental: {
     useCache: true,
     serverActions: {
-      bodySizeLimit: "200mb",
+      bodySizeLimit: "50mb",
     },
   },
 };
