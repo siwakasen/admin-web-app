@@ -1,22 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent } from "@/components/ui/card";
-import { TravelPackagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-packages-form";
-import { TravelImagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-images-form";
-import { useGetTravelPackagesDetail, useUpdateTravelPackage } from "@/hooks/travel.hook";
-import { toast } from "sonner";
-import { Check, Loader2 } from "lucide-react";
-import { UpdateTravelPackageResponse, TravelPackages } from "@/interfaces";
-import { TypeTravelPackageSchema } from "@/lib/validations/travel.schemas";
+import { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent } from '@/components/ui/card';
+import { TravelPackagesForm } from '@/app/(authenticated)/travel-packages/_components/travel-packages-form';
+import { TravelImagesForm } from '@/app/(authenticated)/travel-packages/_components/travel-images-form';
+import {
+  useGetTravelPackagesDetail,
+  useUpdateTravelPackage,
+} from '@/hooks/travel.hook';
+import { toast } from 'sonner';
+import { Check, Loader2 } from 'lucide-react';
+import { UpdateTravelPackageResponse, TravelPackages } from '@/interfaces';
+import { TypeTravelPackageSchema } from '@/lib/validations/travel.schemas';
 
 export default function EditTravelPackagePage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const packageId = Number(params.id);
-  const initialStep = searchParams.get('step') ? Number(searchParams.get('step')) : 1;
+  const initialStep = searchParams.get('step')
+    ? Number(searchParams.get('step'))
+    : 1;
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [packageData, setPackageData] = useState<TravelPackages | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,11 +34,11 @@ export default function EditTravelPackagePage() {
         if ('data' in response) {
           setPackageData(response.data);
         } else {
-          toast.error("Failed to fetch travel package data");
+          toast.error('Failed to fetch travel package data');
         }
       } catch (error) {
-        console.error("Error fetching package data:", error);
-        toast.error("Failed to fetch travel package data");
+        console.error('Error fetching package data:', error);
+        toast.error('Failed to fetch travel package data');
       } finally {
         setIsLoading(false);
       }
@@ -46,42 +51,48 @@ export default function EditTravelPackagePage() {
 
   const handleTravelPackageSubmit = async (data: TypeTravelPackageSchema) => {
     try {
-      const response: UpdateTravelPackageResponse | {status?: number, errors?: any} 
-      = await useUpdateTravelPackage(packageId, data);
-      if('errors' in response) {
-        if(response.status === 403) {
-          toast.error("You are not authorized to update this travel package");
+      const response:
+        | UpdateTravelPackageResponse
+        | { status?: number; errors?: any } = await useUpdateTravelPackage(
+        packageId,
+        data
+      );
+      if ('errors' in response) {
+        if (response.status === 403) {
+          toast.error('You are not authorized to update this travel package');
         } else {
-          toast.error(response.errors?.message || "Failed to update travel package");
+          toast.error(
+            response.errors?.message || 'Failed to update travel package'
+          );
         }
         return;
-      } else if('data' in response) {
+      } else if ('data' in response) {
         setPackageData(response.data);
         setCurrentStep(2);
         // Update URL to include step parameter
         const url = new URL(window.location.href);
         url.searchParams.set('step', '2');
         window.history.replaceState({}, '', url.toString());
-        toast.success("Travel package updated successfully!");
-      }        
+        toast.success('Travel package updated successfully!');
+      }
     } catch (error) {
-      console.error("Error updating travel package:", error);
-      toast.error("Failed to update travel package. Please try again.");
+      console.error('Error updating travel package:', error);
+      toast.error('Failed to update travel package. Please try again.');
     }
   };
 
   const steps = [
     {
       id: 1,
-      title: "Package Details",
-      description: "Update travel package information",
-      icon: "1",
+      title: 'Package Details',
+      description: 'Update travel package information',
+      icon: '1',
     },
     {
       id: 2,
-      title: "Update Images",
-      description: "Update images for your travel package",
-      icon: "2",
+      title: 'Update Images',
+      description: 'Update images for your travel package',
+      icon: '2',
     },
   ];
 
@@ -114,7 +125,9 @@ export default function EditTravelPackagePage() {
             <Card>
               <CardContent className="p-6">
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">Travel package not found</p>
+                  <p className="text-muted-foreground">
+                    Travel package not found
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -139,8 +152,8 @@ export default function EditTravelPackagePage() {
                       onClick={() => setCurrentStep(step.id)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer ${
                         currentStep >= step.id
-                          ? "bg-primary text-primary-foreground hover:bg-primary/80"
-                          : "bg-muted text-muted-foreground hover:bg-muted-foreground/70"
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/80'
+                          : 'bg-muted text-muted-foreground hover:bg-muted-foreground/70'
                       }`}
                     >
                       {currentStep > step.id ? (
@@ -153,8 +166,8 @@ export default function EditTravelPackagePage() {
                       <h3
                         className={`text-sm font-semibold ${
                           currentStep >= step.id
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
                         }`}
                       >
                         {step.title}
@@ -167,9 +180,7 @@ export default function EditTravelPackagePage() {
                   {index < steps.length - 1 && (
                     <div
                       className={`flex-1 h-0.5 mx-4 transition-colors ${
-                        currentStep > step.id
-                          ? "bg-primary"
-                          : "bg-muted"
+                        currentStep > step.id ? 'bg-primary' : 'bg-muted'
                       }`}
                     />
                   )}
@@ -191,8 +202,8 @@ export default function EditTravelPackagePage() {
                       Update the details for your travel package.
                     </p>
                   </div>
-                  <TravelPackagesForm 
-                    onNext={handleTravelPackageSubmit} 
+                  <TravelPackagesForm
+                    onNext={handleTravelPackageSubmit}
                     initialData={packageData}
                     isEditing={true}
                   />

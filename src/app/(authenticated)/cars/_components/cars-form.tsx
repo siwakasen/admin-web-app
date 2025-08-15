@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CarSchema, TypeCarSchema } from "@/lib/validations/cars.schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CarSchema, TypeCarSchema } from '@/lib/validations/cars.schemas';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -13,12 +13,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useEffect } from "react";
-import { Car } from "@/interfaces";
-import { Plus, Trash } from "lucide-react";
+} from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useState, useEffect } from 'react';
+import { Car } from '@/interfaces';
+import { Plus, Trash } from 'lucide-react';
 
 interface CarsFormProps {
   onNext: (data: any) => void;
@@ -26,23 +32,27 @@ interface CarsFormProps {
   isEditing?: boolean;
 }
 
-export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormProps) {
+export function CarsForm({
+  onNext,
+  initialData,
+  isEditing = false,
+}: CarsFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(isEditing);
 
   const form = useForm({
     resolver: zodResolver(CarSchema),
     defaultValues: {
-      car_name: "",
-      car_color: "",
-      police_number: "",
-      transmission: "",
-      description: "",
+      car_name: '',
+      car_color: '',
+      police_number: '',
+      transmission: '',
+      description: '',
       max_persons: 0,
       price_per_day: 0,
-      includes: [""],
+      includes: [''],
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   // Set initial values when editing
@@ -56,7 +66,7 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
         description: initialData.description,
         max_persons: initialData.max_persons,
         price_per_day: initialData.price_per_day,
-        includes: initialData.includes.length > 0 ? initialData.includes : [""],
+        includes: initialData.includes.length > 0 ? initialData.includes : [''],
       });
       setIsLoading(false);
     } else if (!isEditing) {
@@ -65,14 +75,12 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
   }, [initialData, isEditing, form]);
 
   // Watch includes array and validate
-  const includes = form.watch("includes");
+  const includes = form.watch('includes');
   useEffect(() => {
     if (form.formState.isSubmitted) {
       validateIncludes();
     }
   }, [includes, form.formState.isSubmitted]);
-
-
 
   const onSubmit = async (data: TypeCarSchema) => {
     setIsSubmitting(true);
@@ -82,10 +90,12 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
         setIsSubmitting(false);
         return;
       }
-      
+
       // Filter out empty strings
-      const filteredIncludes = data.includes.filter((item: string) => item.trim() !== "");
-      
+      const filteredIncludes = data.includes.filter(
+        (item: string) => item.trim() !== ''
+      );
+
       // Convert string arrays to proper format
       const formattedData = {
         ...data,
@@ -96,15 +106,17 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
 
       onNext(formattedData);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const addInclude = () => {
-    const currentIncludes = form.getValues("includes");
-    form.setValue("includes", [...currentIncludes, ""], { shouldValidate: true });
+    const currentIncludes = form.getValues('includes');
+    form.setValue('includes', [...currentIncludes, ''], {
+      shouldValidate: true,
+    });
     // Trigger validation after adding
     setTimeout(() => {
       validateIncludes();
@@ -112,9 +124,13 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
   };
 
   const removeInclude = (index: number) => {
-    const currentIncludes = form.getValues("includes");
+    const currentIncludes = form.getValues('includes');
     if (currentIncludes.length > 1) {
-      form.setValue("includes", currentIncludes.filter((_, i) => i !== index), { shouldValidate: true });
+      form.setValue(
+        'includes',
+        currentIncludes.filter((_, i) => i !== index),
+        { shouldValidate: true }
+      );
       // Trigger validation after removing
       setTimeout(() => {
         validateIncludes();
@@ -124,28 +140,30 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
 
   // Custom validation for includes array
   const validateIncludes = () => {
-    const includes = form.getValues("includes");
-    const filteredIncludes = includes.filter((item: string) => item.trim() !== "");
-    
+    const includes = form.getValues('includes');
+    const filteredIncludes = includes.filter(
+      (item: string) => item.trim() !== ''
+    );
+
     if (filteredIncludes.length === 0) {
-      form.setError("includes", {
-        type: "manual",
-        message: "At least one include item is required"
+      form.setError('includes', {
+        type: 'manual',
+        message: 'At least one include item is required',
       });
       return false;
     }
-    
-    form.clearErrors(["includes"]);
+
+    form.clearErrors(['includes']);
     return true;
   };
 
   // Force validation on form submission
-  const handleSubmit = async (data: TypeCarSchema ) => {
+  const handleSubmit = async (data: TypeCarSchema) => {
     // Validate includes before submission
     if (!validateIncludes()) {
       return;
     }
-    
+
     await onSubmit(data);
   };
 
@@ -170,8 +188,11 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6" onInvalid={(e) => {
-      }}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-6"
+        onInvalid={(e) => {}}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Car Name */}
           <FormField
@@ -225,7 +246,10 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Transmission</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ""}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ''}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select transmission type" />
@@ -249,9 +273,9 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
               <FormItem>
                 <FormLabel>Max Persons</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Enter max persons" 
+                  <Input
+                    type="number"
+                    placeholder="Enter max persons"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
@@ -269,9 +293,9 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
               <FormItem>
                 <FormLabel>Price per Day</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Enter price per day" 
+                  <Input
+                    type="number"
+                    placeholder="Enter price per day"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
@@ -282,8 +306,6 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
           />
         </div>
 
-
-
         {/* Description */}
         <FormField
           control={form.control}
@@ -292,10 +314,10 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Enter car description" 
+                <Textarea
+                  placeholder="Enter car description"
                   className="min-h-[100px]"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -318,8 +340,8 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
               Add Include
             </Button>
           </div>
-          
-          {form.watch("includes").map((_, index) => (
+
+          {form.watch('includes').map((_, index) => (
             <FormField
               key={index}
               control={form.control}
@@ -328,9 +350,9 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
                 <FormItem>
                   <FormControl>
                     <div className="flex gap-2">
-                      <Input 
-                        placeholder="Enter include item" 
-                        {...field} 
+                      <Input
+                        placeholder="Enter include item"
+                        {...field}
                         onChange={(e) => {
                           field.onChange(e);
                           // Trigger validation after a short delay
@@ -339,13 +361,13 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
                           }, 100);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
+                          if (e.key === 'Enter') {
                             e.preventDefault();
                             addInclude();
                           }
                         }}
                       />
-                      {form.watch("includes").length > 1 && (
+                      {form.watch('includes').length > 1 && (
                         <Button
                           type="button"
                           variant="destructive"
@@ -364,29 +386,36 @@ export function CarsForm({ onNext, initialData, isEditing = false }: CarsFormPro
             />
           ))}
           {form.formState.errors.includes && (
-            <FormMessage>
-              {form.formState.errors.includes.message}
-            </FormMessage>
+            <FormMessage>{form.formState.errors.includes.message}</FormMessage>
           )}
           {/* Debug: Show current includes state */}
           {process.env.NODE_ENV === 'development' && (
             <div className="text-xs text-gray-500 mt-2">
-              Debug: Includes count: {form.watch("includes").filter((item: string) => item.trim() !== "").length}
+              Debug: Includes count:{' '}
+              {
+                form
+                  .watch('includes')
+                  .filter((item: string) => item.trim() !== '').length
+              }
             </div>
           )}
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-end">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting}
             className="bg-green-600 hover:bg-green-700 cursor-pointer"
           >
-            {isSubmitting ? "Creating..." : (isEditing ? "Update Car" : "Create Car")}
+            {isSubmitting
+              ? 'Creating...'
+              : isEditing
+              ? 'Update Car'
+              : 'Create Car'}
           </Button>
         </div>
       </form>
     </Form>
   );
-} 
+}

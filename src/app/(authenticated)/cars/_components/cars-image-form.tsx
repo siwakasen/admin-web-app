@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Upload, X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { convertCarImageUrl } from "@/lib/helper/images-url";
-import { useUploadCarImage } from "@/hooks/cars.hook";
+import { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Upload, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { convertCarImageUrl } from '@/lib/helper/images-url';
+import { useUploadCarImage } from '@/hooks/cars.hook';
 
 interface CarsImageFormProps {
   carId: number;
@@ -17,7 +17,13 @@ interface CarsImageFormProps {
   onRefetch: () => void;
 }
 
-export function CarsImageForm({ carId, onBack, isEditing = false, existingImage, onRefetch }: CarsImageFormProps) {
+export function CarsImageForm({
+  carId,
+  onBack,
+  isEditing = false,
+  existingImage,
+  onRefetch,
+}: CarsImageFormProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -26,9 +32,9 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   }, []);
@@ -43,7 +49,7 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
       if (file.type.startsWith('image/')) {
         setSelectedImage(file);
       } else {
-        toast.warning("Please select an image file.");
+        toast.warning('Please select an image file.');
       }
     }
   }, []);
@@ -54,7 +60,7 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
       if (file.type.startsWith('image/')) {
         setSelectedImage(file);
       } else {
-        toast.warning("Please select an image file.");
+        toast.warning('Please select an image file.');
       }
     }
   };
@@ -65,26 +71,30 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
 
   const handleSubmit = async () => {
     if (!selectedImage && !existingImage) {
-      toast.error("Please select an image");
+      toast.error('Please select an image');
       return;
     }
 
     setIsUploading(true);
     try {
       const response = await useUploadCarImage(carId, selectedImage!);
-      if('errors' in response) {
-        toast.error(response.errors?.message || "Failed to upload image");
+      if ('errors' in response) {
+        toast.error(response.errors?.message || 'Failed to upload image');
         return;
-      } else if('data' in response && 'message' in response) {
-        toast.success(isEditing ? "Image updated successfully!" : "Image uploaded successfully!");
+      } else if ('data' in response && 'message' in response) {
+        toast.success(
+          isEditing
+            ? 'Image updated successfully!'
+            : 'Image uploaded successfully!'
+        );
         setSelectedImage(null);
         onRefetch();
         // Redirect to cars page
       }
-      router.push("/cars");
+      router.push('/cars');
     } catch (error) {
-      console.error("Error uploading image:", error);
-      toast.error("Failed to upload image. Please try again.");
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -94,13 +104,12 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">
-          {isEditing ? "Update Car Image" : "Upload Car Image"}
+          {isEditing ? 'Update Car Image' : 'Upload Car Image'}
         </h2>
         <p className="text-muted-foreground">
-          {isEditing 
-            ? "Update image for your car. You can drag and drop a new image or click to select."
-            : "Upload image for your car. You can drag and drop an image or click to select."
-          }
+          {isEditing
+            ? 'Update image for your car. You can drag and drop a new image or click to select.'
+            : 'Upload image for your car. You can drag and drop an image or click to select.'}
         </p>
       </div>
 
@@ -132,8 +141,8 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive
-                ? "border-primary bg-primary/5"
-                : "border-muted-foreground/25"
+                ? 'border-primary bg-primary/5'
+                : 'border-muted-foreground/25'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -142,7 +151,9 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
           >
             <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">
-              {isEditing ? "Drag and drop new image here" : "Drag and drop image here"}
+              {isEditing
+                ? 'Drag and drop new image here'
+                : 'Drag and drop image here'}
             </h3>
             <p className="text-muted-foreground mb-4">
               or click to browse files
@@ -150,7 +161,9 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
             <Button
               type="button"
               variant="outline"
-              onClick={() => document.getElementById("car-image-input")?.click()}
+              onClick={() =>
+                document.getElementById('car-image-input')?.click()
+              }
             >
               Select Image
             </Button>
@@ -214,9 +227,13 @@ export function CarsImageForm({ carId, onBack, isEditing = false, existingImage,
           disabled={isUploading || (!selectedImage && !existingImage)}
           className="cursor-pointer"
         >
-          {isUploading ? "Uploading..." : (isEditing ? "Update Image" : "Save Image")}
+          {isUploading
+            ? 'Uploading...'
+            : isEditing
+            ? 'Update Image'
+            : 'Save Image'}
         </Button>
       </div>
     </div>
   );
-} 
+}

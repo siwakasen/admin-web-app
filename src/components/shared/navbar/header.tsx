@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Breadcrumb,
@@ -7,14 +7,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { usePathname } from 'next/navigation';
 export function HeaderNavigation() {
   const pathname = usePathname();
 
-  const segments = pathname.split("/").filter((segment) => segment !== "");
+  const segments = pathname.split('/').filter((segment) => segment !== '');
 
   const breadcrumbItems =
     segments.length === 0 ? (
@@ -25,9 +25,9 @@ export function HeaderNavigation() {
       segments.map((segment, index) => {
         const isLast = index === segments.length - 1;
         const capitalizedSegment =
-          segment.charAt(0).toUpperCase() + segment.slice(1).replace("-", " ");
+          segment.charAt(0).toUpperCase() + segment.slice(1).replace('-', ' ');
 
-        const hrefPath = "/" + segments.slice(0, index + 1).join("/");
+        const hrefPath = '/' + segments.slice(0, index + 1).join('/');
 
         return (
           <div key={index} className="flex items-center">

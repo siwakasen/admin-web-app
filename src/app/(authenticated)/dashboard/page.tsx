@@ -1,18 +1,18 @@
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { QuickActions } from "@/components/shared/quick-actions";
-import { useGetEmployee } from "@/hooks/employees.hook";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Clock, Play, CheckCircle } from "lucide-react";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { RedirectType } from "next/navigation";
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { QuickActions } from '@/components/shared/quick-actions';
+import { useGetEmployee } from '@/hooks/employees.hook';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Clock, Play, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { RedirectType } from 'next/navigation';
 
 export default async function Page() {
   const { employee } = await useGetEmployee();
 
   if (!employee) {
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
 
   return (
@@ -25,7 +25,8 @@ export default async function Page() {
             Welcome back, {employee.name}!
           </h1>
           <p className="text-muted-foreground">
-            Here's what you can do today as a {employee.role.role_name.toLowerCase()}.
+            Here's what you can do today as a{' '}
+            {employee.role.role_name.toLowerCase()}.
           </p>
         </div>
 
@@ -37,9 +38,7 @@ export default async function Page() {
 
         {/* Main Content Area */}
         <div className="bg-muted/50 min-h-[20dvh] flex-1 rounded-xl p-6 flex items-center justify-center">
-          <p className="text-muted-foreground text-center">
-            
-          </p>
+          <p className="text-muted-foreground text-center"></p>
         </div>
       </div>
     </section>

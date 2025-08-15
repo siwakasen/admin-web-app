@@ -1,10 +1,13 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateEmployeeSchema, UpdateEmployeeSchemaType } from "@/lib/validations/employees.schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  UpdateEmployeeSchema,
+  UpdateEmployeeSchemaType,
+} from '@/lib/validations/employees.schemas';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -12,16 +15,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useState, useEffect } from "react";
-import { Employee } from "@/interfaces";
+} from '@/components/ui/select';
+import { useState, useEffect } from 'react';
+import { Employee } from '@/interfaces';
 
 interface EditEmployeeFormProps {
   onNext: (data: any) => void;
@@ -31,33 +34,36 @@ interface EditEmployeeFormProps {
 const roles = [
   {
     id: 1,
-    name: "Owner",
+    name: 'Owner',
   },
   {
     id: 2,
-    name: "Admin",
+    name: 'Admin',
   },
   {
     id: 3,
-    name: "Tour Guide",
+    name: 'Tour Guide',
   },
   {
     id: 4,
-    name: "Driver",
+    name: 'Driver',
   },
 ];
 
-export function EditEmployeeForm({ onNext, initialData }: EditEmployeeFormProps) {
+export function EditEmployeeForm({
+  onNext,
+  initialData,
+}: EditEmployeeFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(UpdateEmployeeSchema),
     defaultValues: {
-      name: "",
+      name: '',
       role_id: 0,
       salary: 0,
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   // Set initial values when editing
@@ -72,7 +78,7 @@ export function EditEmployeeForm({ onNext, initialData }: EditEmployeeFormProps)
   }, [initialData, form]);
 
   const handleRoleChange = (value: string) => {
-    form.setValue("role_id", Number(value));
+    form.setValue('role_id', Number(value));
   };
 
   const onSubmit = async (data: UpdateEmployeeSchemaType) => {
@@ -80,7 +86,7 @@ export function EditEmployeeForm({ onNext, initialData }: EditEmployeeFormProps)
     try {
       onNext(data);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -110,10 +116,18 @@ export function EditEmployeeForm({ onNext, initialData }: EditEmployeeFormProps)
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Role</FormLabel>
-                <Select onValueChange={handleRoleChange} defaultValue={field.value.toString()}>
+                <Select
+                  onValueChange={handleRoleChange}
+                  defaultValue={field.value.toString()}
+                >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue>{roles.find(role => role.id.toString() === field.value?.toString())?.name || "Select employee role"}</SelectValue>
+                      <SelectValue>
+                        {roles.find(
+                          (role) =>
+                            role.id.toString() === field.value?.toString()
+                        )?.name || 'Select employee role'}
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -150,11 +164,15 @@ export function EditEmployeeForm({ onNext, initialData }: EditEmployeeFormProps)
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting} className="cursor-pointer">
-            {isSubmitting ? "Updating..." : "Update Employee"}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="cursor-pointer"
+          >
+            {isSubmitting ? 'Updating...' : 'Update Employee'}
           </Button>
         </div>
       </form>
     </Form>
   );
-} 
+}

@@ -1,35 +1,36 @@
-"use client";
+'use client';
 
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent } from "@/components/ui/card";
-import { useCreateEmployee } from "@/hooks/employees.hook";
-import { toast } from "sonner";
-import { CreateEmployeeResponse } from "@/interfaces";
-import { CreateEmployeeSchemaType } from "@/lib/validations/employees.schemas";
-import { useRouter } from "next/navigation";
-import { CreateEmployeeForm } from "../_components/create-employee-form";
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent } from '@/components/ui/card';
+import { useCreateEmployee } from '@/hooks/employees.hook';
+import { toast } from 'sonner';
+import { CreateEmployeeResponse } from '@/interfaces';
+import { CreateEmployeeSchemaType } from '@/lib/validations/employees.schemas';
+import { useRouter } from 'next/navigation';
+import { CreateEmployeeForm } from '../_components/create-employee-form';
 
 export default function CreateEmployeePage() {
   const router = useRouter();
 
   const handleEmployeeSubmit = async (data: CreateEmployeeSchemaType) => {
     try {
-      const response: CreateEmployeeResponse | {status?: number, errors?: any} 
-      = await useCreateEmployee(data);
-      if('errors' in response) {
-        if(response.status === 403) {
-          toast.error("You are not authorized to create an employee");
+      const response:
+        | CreateEmployeeResponse
+        | { status?: number; errors?: any } = await useCreateEmployee(data);
+      if ('errors' in response) {
+        if (response.status === 403) {
+          toast.error('You are not authorized to create an employee');
         } else {
-          toast.error(response.errors?.message || "Failed to create employee");
+          toast.error(response.errors?.message || 'Failed to create employee');
         }
         return;
-      } else if('message' in response) {
-        toast.success("Employee created successfully!");
-        router.push("/employees");
-      }        
+      } else if ('message' in response) {
+        toast.success('Employee created successfully!');
+        router.push('/employees');
+      }
     } catch (error) {
-      console.error("Error creating employee:", error);
-      toast.error("Failed to create employee. Please try again.");
+      console.error('Error creating employee:', error);
+      toast.error('Failed to create employee. Please try again.');
     }
   };
 
@@ -62,9 +63,7 @@ export default function CreateEmployeePage() {
             <CardContent className="p-6">
               <div>
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold mb-2">
-                    Create Employee
-                  </h1>
+                  <h1 className="text-2xl font-bold mb-2">Create Employee</h1>
                   <p className="text-muted-foreground">
                     Fill in the details for your new employee.
                   </p>

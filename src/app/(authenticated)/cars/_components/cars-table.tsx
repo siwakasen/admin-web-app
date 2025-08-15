@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Pagination,
   PaginationContent,
@@ -16,10 +16,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Eye,
   Users,
@@ -32,7 +32,7 @@ import {
   Trash2,
   MoreVertical,
   Car,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -41,21 +41,21 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Car as CarInterface } from "@/interfaces";
-import { Meta } from "@/interfaces";
-import Image from "next/image";
-import { useDeleteCar } from "@/hooks/cars.hook";
-import { toast } from "sonner";
-import { redirect } from "next/navigation";
-import { convertCarImageUrl } from "@/lib/helper/images-url";
+} from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Car as CarInterface } from '@/interfaces';
+import { Meta } from '@/interfaces';
+import Image from 'next/image';
+import { useDeleteCar } from '@/hooks/cars.hook';
+import { toast } from 'sonner';
+import { redirect } from 'next/navigation';
+import { convertCarImageUrl } from '@/lib/helper/images-url';
 
 interface CarsTableProps {
   cars: CarInterface[];
@@ -93,14 +93,14 @@ export function CarsTable({
 
   const handleDeleteConfirm = async () => {
     if (!carToDelete) return;
-    
+
     try {
       const response = await useDeleteCar(carToDelete.id);
-      toast.success("Car deleted successfully!");
+      toast.success('Car deleted successfully!');
       onRefetch();
     } catch (error) {
-      console.error("Error deleting car:", error);
-      toast.error("Failed to delete car. Please try again.");
+      console.error('Error deleting car:', error);
+      toast.error('Failed to delete car. Please try again.');
     } finally {
       setDeleteDialogOpen(false);
       setCarToDelete(null);
@@ -125,9 +125,9 @@ export function CarsTable({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(price);
   };
 
@@ -211,27 +211,33 @@ export function CarsTable({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
-                        {car.transmission}
-                      </Badge>
+                      <Badge variant="outline">{car.transmission}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Car className="h-4 w-4 text-blue-600" />
-                        <span className="font-mono text-sm">{car.police_number}</span>
+                        <span className="font-mono text-sm">
+                          {car.police_number}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right w-[120px]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 cursor-pointer"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <Dialog>
                             <DialogTrigger asChild>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                              >
                                 <Eye className="h-4 w-4 mr-2" />
                                 View
                               </DropdownMenuItem>
@@ -248,13 +254,16 @@ export function CarsTable({
                               </ScrollArea>
                             </DialogContent>
                           </Dialog>
-                          
+
                           <DropdownMenuItem onClick={() => handleEdit(car.id)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
-                          
-                          <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteClick(car)}>
+
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600"
+                            onClick={() => handleDeleteClick(car)}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
@@ -274,13 +283,20 @@ export function CarsTable({
                                 </h4>
                                 <div className="space-y-2 text-sm">
                                   <div>
-                                    <span className="font-medium">Color:</span> {car.car_color}
+                                    <span className="font-medium">Color:</span>{' '}
+                                    {car.car_color}
                                   </div>
                                   <div>
-                                    <span className="font-medium">Police Number:</span> {car.police_number}
+                                    <span className="font-medium">
+                                      Police Number:
+                                    </span>{' '}
+                                    {car.police_number}
                                   </div>
                                   <div>
-                                    <span className="font-medium">Transmission:</span> {car.transmission}
+                                    <span className="font-medium">
+                                      Transmission:
+                                    </span>{' '}
+                                    {car.transmission}
                                   </div>
                                 </div>
                               </div>
@@ -311,8 +327,8 @@ export function CarsTable({
       {meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {(meta.currentPage - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{" "}
+            Showing {(meta.currentPage - 1) * meta.limit + 1} to{' '}
+            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{' '}
             {meta.totalItems} results
           </div>
           <Pagination>
@@ -324,8 +340,8 @@ export function CarsTable({
                   }
                   className={
                     !meta.hasPrevPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -352,8 +368,8 @@ export function CarsTable({
                   }
                   className={
                     !meta.hasNextPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -368,7 +384,8 @@ export function CarsTable({
           <DialogHeader>
             <DialogTitle>Delete Car</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{carToDelete?.car_name}"? This action cannot be undone.
+              Are you sure you want to delete "{carToDelete?.car_name}"? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -387,19 +404,19 @@ export function CarsTable({
 
 function CarDetails({ car }: { car: CarInterface }) {
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(price);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -409,7 +426,7 @@ function CarDetails({ car }: { car: CarInterface }) {
         <h3 className="text-lg font-semibold mb-2">Car Information</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium">Price per Day:</span>{" "}
+            <span className="font-medium">Price per Day:</span>{' '}
             {formatPrice(car.price_per_day)}
           </div>
           <div>
@@ -419,10 +436,12 @@ function CarDetails({ car }: { car: CarInterface }) {
             <span className="font-medium">Color:</span> {car.car_color}
           </div>
           <div>
-            <span className="font-medium">Transmission:</span> {car.transmission}
+            <span className="font-medium">Transmission:</span>{' '}
+            {car.transmission}
           </div>
           <div>
-            <span className="font-medium">Police Number:</span> {car.police_number}
+            <span className="font-medium">Police Number:</span>{' '}
+            {car.police_number}
           </div>
         </div>
       </div>
@@ -447,12 +466,12 @@ function CarDetails({ car }: { car: CarInterface }) {
         <div>
           <h3 className="text-lg font-semibold mb-2">Car Image</h3>
           <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-            <Image 
-              src={convertCarImageUrl(car.car_image)} 
-              alt="Car Image" 
-              width={450} 
-              height={300} 
-              className="object-cover rounded-lg" 
+            <Image
+              src={convertCarImageUrl(car.car_image)}
+              alt="Car Image"
+              width={450}
+              height={300}
+              className="object-cover rounded-lg"
             />
           </div>
         </div>
@@ -461,11 +480,11 @@ function CarDetails({ car }: { car: CarInterface }) {
       <div className="pt-4 border-t">
         <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
           <div>
-            <span className="font-medium">Created:</span>{" "}
+            <span className="font-medium">Created:</span>{' '}
             {formatDate(car.created_at)}
           </div>
           <div>
-            <span className="font-medium">Updated:</span>{" "}
+            <span className="font-medium">Updated:</span>{' '}
             {formatDate(car.updated_at)}
           </div>
         </div>

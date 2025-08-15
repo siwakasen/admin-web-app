@@ -1,9 +1,9 @@
-"use server";
-import { AppSidebar } from "@/components/shared/navbar/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useGetEmployee } from "@/hooks/employees.hook";
-import { redirect } from "next/navigation";
-import { toast } from "sonner";
+'use server';
+import { AppSidebar } from '@/components/shared/navbar/app-sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { useGetEmployee } from '@/hooks/employees.hook';
+import { redirect } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default async function AuthenticatedLayout({
   children,
@@ -13,7 +13,7 @@ export default async function AuthenticatedLayout({
   const { employee } = await useGetEmployee();
 
   if (!employee) {
-    redirect("/redirect/reset-cookie");
+    redirect('/redirect/reset-cookie');
   }
   return (
     <SidebarProvider>

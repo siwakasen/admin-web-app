@@ -54,7 +54,7 @@ export default function Action({
         console.log('assigning employee');
         const response = await useAssignBookingToEmployee(
           booking.id,
-          Number(selectedEmployeeId),
+          Number(selectedEmployeeId)
         );
         if ('errors' in response) {
           toast.error(response.errors.message || 'Failed to assign employee');

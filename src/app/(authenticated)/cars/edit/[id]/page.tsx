@@ -1,22 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent } from "@/components/ui/card";
-import { CarsForm } from "@/app/(authenticated)/cars/_components/cars-form";
-import { useGetCarDetail, useUpdateCar } from "@/hooks/cars.hook";
-import { toast } from "sonner";
-import { Check, Loader2 } from "lucide-react";
-import { CarsDetailResponse, Car } from "@/interfaces";
-import { TypeCarSchema } from "@/lib/validations/cars.schemas";
-import { CarsImageForm } from "../../_components/cars-image-form";
+import { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent } from '@/components/ui/card';
+import { CarsForm } from '@/app/(authenticated)/cars/_components/cars-form';
+import { useGetCarDetail, useUpdateCar } from '@/hooks/cars.hook';
+import { toast } from 'sonner';
+import { Check, Loader2 } from 'lucide-react';
+import { CarsDetailResponse, Car } from '@/interfaces';
+import { TypeCarSchema } from '@/lib/validations/cars.schemas';
+import { CarsImageForm } from '../../_components/cars-image-form';
 
 export default function EditCarPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const carId = Number(params.id);
-  const initialStep = searchParams.get('step') ? Number(searchParams.get('step')) : 1;
+  const initialStep = searchParams.get('step')
+    ? Number(searchParams.get('step'))
+    : 1;
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [carData, setCarData] = useState<Car | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,11 +32,11 @@ export default function EditCarPage() {
         if ('data' in response) {
           setCarData(response.data);
         } else {
-          toast.error("Failed to fetch car data");
+          toast.error('Failed to fetch car data');
         }
       } catch (error) {
-        console.error("Error fetching car data:", error);
-        toast.error("Failed to fetch car data");
+        console.error('Error fetching car data:', error);
+        toast.error('Failed to fetch car data');
       } finally {
         setIsLoading(false);
       }
@@ -47,42 +49,42 @@ export default function EditCarPage() {
 
   const handleCarSubmit = async (data: TypeCarSchema) => {
     try {
-      const response: CarsDetailResponse | {status?: number, errors?: any} 
-      = await useUpdateCar(carId, data);
-      if('errors' in response) {
-        if(response.status === 403) {
-          toast.error("You are not authorized to update this car");
+      const response: CarsDetailResponse | { status?: number; errors?: any } =
+        await useUpdateCar(carId, data);
+      if ('errors' in response) {
+        if (response.status === 403) {
+          toast.error('You are not authorized to update this car');
         } else {
-          toast.error(response.errors?.message || "Failed to update car");
+          toast.error(response.errors?.message || 'Failed to update car');
         }
         return;
-      } else if('data' in response) {
+      } else if ('data' in response) {
         setCarData(response.data);
         setCurrentStep(2);
         // Update URL to include step parameter
         const url = new URL(window.location.href);
         url.searchParams.set('step', '2');
         window.history.replaceState({}, '', url.toString());
-        toast.success("Car updated successfully!");
-      }        
+        toast.success('Car updated successfully!');
+      }
     } catch (error) {
-      console.error("Error updating car:", error);
-      toast.error("Failed to update car. Please try again.");
+      console.error('Error updating car:', error);
+      toast.error('Failed to update car. Please try again.');
     }
   };
 
   const steps = [
     {
       id: 1,
-      title: "Car Details",
-      description: "Update car information",
-      icon: "1",
+      title: 'Car Details',
+      description: 'Update car information',
+      icon: '1',
     },
     {
       id: 2,
-      title: "Update Image",
-      description: "Update image for your car",
-      icon: "2",
+      title: 'Update Image',
+      description: 'Update image for your car',
+      icon: '2',
     },
   ];
 
@@ -140,8 +142,8 @@ export default function EditCarPage() {
                       onClick={() => setCurrentStep(step.id)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer ${
                         currentStep >= step.id
-                          ? "bg-primary text-primary-foreground hover:bg-primary/80"
-                          : "bg-muted text-muted-foreground hover:bg-muted-foreground/70"
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/80'
+                          : 'bg-muted text-muted-foreground hover:bg-muted-foreground/70'
                       }`}
                     >
                       {currentStep > step.id ? (
@@ -154,8 +156,8 @@ export default function EditCarPage() {
                       <h3
                         className={`text-sm font-semibold ${
                           currentStep >= step.id
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
                         }`}
                       >
                         {step.title}
@@ -168,9 +170,7 @@ export default function EditCarPage() {
                   {index < steps.length - 1 && (
                     <div
                       className={`flex-1 h-0.5 mx-4 transition-colors ${
-                        currentStep > step.id
-                          ? "bg-primary"
-                          : "bg-muted"
+                        currentStep > step.id ? 'bg-primary' : 'bg-muted'
                       }`}
                     />
                   )}
@@ -185,15 +185,13 @@ export default function EditCarPage() {
               {currentStep === 1 && (
                 <div>
                   <div className="mb-6">
-                    <h1 className="text-2xl font-bold mb-2">
-                      Edit Car
-                    </h1>
+                    <h1 className="text-2xl font-bold mb-2">Edit Car</h1>
                     <p className="text-muted-foreground">
                       Update the details for your car.
                     </p>
                   </div>
-                  <CarsForm 
-                    onNext={handleCarSubmit} 
+                  <CarsForm
+                    onNext={handleCarSubmit}
                     initialData={carData}
                     isEditing={true}
                   />
@@ -221,4 +219,4 @@ export default function EditCarPage() {
       </div>
     </section>
   );
-} 
+}

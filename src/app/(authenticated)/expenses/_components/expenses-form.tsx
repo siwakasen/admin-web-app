@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createExpenseSchema } from "@/lib/validations/expenses.schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createExpenseSchema } from '@/lib/validations/expenses.schemas';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -13,11 +13,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useState, useEffect } from "react";
-import { Expense } from "@/interfaces/expenses.interface";
-import { CreateExpenseRequest } from "@/interfaces/expenses.interface";
-import { z } from "zod";
+} from '@/components/ui/form';
+import { useState, useEffect } from 'react';
+import { Expense } from '@/interfaces/expenses.interface';
+import { CreateExpenseRequest } from '@/interfaces/expenses.interface';
+import { z } from 'zod';
 
 type ExpenseFormData = z.infer<typeof createExpenseSchema>;
 
@@ -27,18 +27,22 @@ interface ExpensesFormProps {
   isEditing?: boolean;
 }
 
-export function ExpensesForm({ onNext, initialData, isEditing = false }: ExpensesFormProps) {
+export function ExpensesForm({
+  onNext,
+  initialData,
+  isEditing = false,
+}: ExpensesFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(isEditing);
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(createExpenseSchema),
     defaultValues: {
-      expense_name: "",
+      expense_name: '',
       expense_amount: 0,
-      expense_date: "",
+      expense_date: '',
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   // Set initial values when editing
@@ -66,7 +70,7 @@ export function ExpensesForm({ onNext, initialData, isEditing = false }: Expense
 
       onNext(formattedData);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -135,11 +139,7 @@ export function ExpensesForm({ onNext, initialData, isEditing = false }: Expense
               <FormItem>
                 <FormLabel>Expense Date *</FormLabel>
                 <FormControl>
-                  <Input
-                    type="date"
-                    {...field}
-                    className="w-full"
-                  />
+                  <Input type="date" {...field} className="w-full" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -156,10 +156,10 @@ export function ExpensesForm({ onNext, initialData, isEditing = false }: Expense
               {isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {isEditing ? "Updating..." : "Creating..."}
+                  {isEditing ? 'Updating...' : 'Creating...'}
                 </>
               ) : (
-                <>{isEditing ? "Update Expense" : "Create Expense"}</>
+                <>{isEditing ? 'Update Expense' : 'Create Expense'}</>
               )}
             </Button>
           </div>
@@ -167,4 +167,4 @@ export function ExpensesForm({ onNext, initialData, isEditing = false }: Expense
       </Form>
     </div>
   );
-} 
+}

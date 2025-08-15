@@ -1,5 +1,5 @@
-"use client";
-import { cn } from "@/lib/utils";
+'use client';
+import { cn } from '@/lib/utils';
 import {
   Form,
   FormControl,
@@ -7,32 +7,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { LoginFormSchema, LoginFormSchemaType } from "@/lib/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useLoginUser } from "@/hooks/employees.hook";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { Eye, EyeOff, Info, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { LoginFormSchema, LoginFormSchemaType } from '@/lib/validations';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLoginUser } from '@/hooks/employees.hook';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { Eye, EyeOff, Info, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"form">) {
+}: React.ComponentProps<'form'>) {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const form = useForm<LoginFormSchemaType>({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
@@ -42,13 +42,13 @@ export function LoginForm({
       if (response.status && response.status !== 200) {
         switch (true) {
           case !!response.errors?.email:
-            form.setFocus("email");
-            form.setError("email", { message: response.errors.email });
+            form.setFocus('email');
+            form.setError('email', { message: response.errors.email });
             break;
 
           case !!response.errors?.password:
-            form.setFocus("password");
-            form.setError("password", { message: response.errors.password });
+            form.setFocus('password');
+            form.setError('password', { message: response.errors.password });
             break;
 
           case !!response.errors?.message:
@@ -60,7 +60,7 @@ export function LoginForm({
       if (response.message) {
         toast.success(response.message);
 
-        router.push("/dashboard");
+        router.push('/dashboard');
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -69,7 +69,7 @@ export function LoginForm({
   return (
     <Form {...form}>
       <form
-        className={cn("flex flex-col gap-6", className)}
+        className={cn('flex flex-col gap-6', className)}
         {...props}
         onSubmit={form.handleSubmit(onSubmit)}
       >
@@ -120,7 +120,7 @@ export function LoginForm({
                     <div className="relative">
                       <Input
                         id="password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Enter Password"
                         className="w-full pr-10"
                         {...field}
@@ -151,7 +151,7 @@ export function LoginForm({
             {form.formState.isSubmitting ? (
               <Loader2 className="animate-spin" />
             ) : (
-              "Login"
+              'Login'
             )}
           </Button>
         </div>

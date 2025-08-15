@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Pagination,
   PaginationContent,
@@ -16,10 +16,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Eye,
   Users,
@@ -31,7 +31,7 @@ import {
   Edit,
   Trash2,
   MoreVertical,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -40,21 +40,24 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { DeleteTravelPackageResponse, TravelPackages } from "@/interfaces/travel.interface";
-import { Meta } from "@/interfaces";
-import Image from "next/image";
-import { useDeleteTravelPackage } from "@/hooks/travel.hook";
-import { toast } from "sonner";
-import { redirect } from "next/navigation";
-import { convertTravelImageUrl } from "@/lib/helper/images-url";
+} from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  DeleteTravelPackageResponse,
+  TravelPackages,
+} from '@/interfaces/travel.interface';
+import { Meta } from '@/interfaces';
+import Image from 'next/image';
+import { useDeleteTravelPackage } from '@/hooks/travel.hook';
+import { toast } from 'sonner';
+import { redirect } from 'next/navigation';
+import { convertTravelImageUrl } from '@/lib/helper/images-url';
 
 interface TravelPackagesTableProps {
   packages: TravelPackages[];
@@ -73,7 +76,9 @@ export function TravelPackagesTable({
 }: TravelPackagesTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [packageToDelete, setPackageToDelete] = useState<TravelPackages | null>(null);
+  const [packageToDelete, setPackageToDelete] = useState<TravelPackages | null>(
+    null
+  );
   const toggleRowExpansion = (id: number) => {
     const newExpanded = new Set(expandedRows);
     if (newExpanded.has(id)) {
@@ -91,18 +96,24 @@ export function TravelPackagesTable({
 
   const handleDeleteConfirm = async () => {
     if (!packageToDelete) return;
-    
+
     try {
-      const response: DeleteTravelPackageResponse | {status?: number, errors?: any} = await useDeleteTravelPackage(packageToDelete.id);
-      if('errors' in response) {
-        toast.error(response.errors?.message || "Failed to delete travel package");
-      } else if('data' in response) {
-        toast.success("Travel package deleted successfully!");
+      const response:
+        | DeleteTravelPackageResponse
+        | { status?: number; errors?: any } = await useDeleteTravelPackage(
+        packageToDelete.id
+      );
+      if ('errors' in response) {
+        toast.error(
+          response.errors?.message || 'Failed to delete travel package'
+        );
+      } else if ('data' in response) {
+        toast.success('Travel package deleted successfully!');
         onRefetch();
       }
     } catch (error) {
-      console.error("Error deleting travel package:", error);
-      toast.error("Failed to delete travel package. Please try again.");
+      console.error('Error deleting travel package:', error);
+      toast.error('Failed to delete travel package. Please try again.');
     } finally {
       setDeleteDialogOpen(false);
       setPackageToDelete(null);
@@ -116,7 +127,7 @@ export function TravelPackagesTable({
 
   const handleEdit = (id: number) => {
     redirect(`/travel-packages/edit/${id}`);
-  }
+  };
 
   const truncateDescription = (description: string, maxWords: number = 8) => {
     const words = description.split(' ');
@@ -127,9 +138,9 @@ export function TravelPackagesTable({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(price);
   };
 
@@ -159,7 +170,7 @@ export function TravelPackagesTable({
               <TableHead>Duration</TableHead>
               <TableHead>Max Persons</TableHead>
               <TableHead>Images</TableHead>
-                <TableHead className="text-right w-[120px]">Actions</TableHead>
+              <TableHead className="text-right w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -172,7 +183,7 @@ export function TravelPackagesTable({
             ) : (
               packages.map((pkg) => (
                 <React.Fragment key={pkg.id}>
-                  <TableRow className="hover:bg-muted/50 cursor-pointer" >
+                  <TableRow className="hover:bg-muted/50 cursor-pointer">
                     <TableCell>
                       <Button
                         variant="ghost"
@@ -227,45 +238,55 @@ export function TravelPackagesTable({
                       </div>
                     </TableCell>
                     <TableCell className="text-right w-[120px]">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-2xl max-h-[80vh]">
-                                <DialogHeader>
-                                  <DialogTitle>{pkg.package_name}</DialogTitle>
-                                  <DialogDescription>
-                                    View detailed information about this travel package.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <ScrollArea className="max-h-[60vh]">
-                                  <PackageDetails package={pkg} />
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                            
-                            <DropdownMenuItem onClick={() => handleEdit(pkg.id)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteClick(pkg)}>
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 cursor-pointer"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View
+                              </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[80vh]">
+                              <DialogHeader>
+                                <DialogTitle>{pkg.package_name}</DialogTitle>
+                                <DialogDescription>
+                                  View detailed information about this travel
+                                  package.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <ScrollArea className="max-h-[60vh]">
+                                <PackageDetails package={pkg} />
+                              </ScrollArea>
+                            </DialogContent>
+                          </Dialog>
+
+                          <DropdownMenuItem onClick={() => handleEdit(pkg.id)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600"
+                            onClick={() => handleDeleteClick(pkg)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                   {expandedRows.has(pkg.id) && (
                     <TableRow>
@@ -318,8 +339,8 @@ export function TravelPackagesTable({
       {meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {(meta.currentPage - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{" "}
+            Showing {(meta.currentPage - 1) * meta.limit + 1} to{' '}
+            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{' '}
             {meta.totalItems} results
           </div>
           <Pagination>
@@ -331,8 +352,8 @@ export function TravelPackagesTable({
                   }
                   className={
                     !meta.hasPrevPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -359,8 +380,8 @@ export function TravelPackagesTable({
                   }
                   className={
                     !meta.hasNextPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -375,7 +396,8 @@ export function TravelPackagesTable({
           <DialogHeader>
             <DialogTitle>Delete Travel Package</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{packageToDelete?.package_name}"? This action cannot be undone.
+              Are you sure you want to delete "{packageToDelete?.package_name}"?
+              This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -394,19 +416,19 @@ export function TravelPackagesTable({
 
 function PackageDetails({ package: pkg }: { package: TravelPackages }) {
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(price);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -416,7 +438,7 @@ function PackageDetails({ package: pkg }: { package: TravelPackages }) {
         <h3 className="text-lg font-semibold mb-2">Package Information</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium">Price:</span>{" "}
+            <span className="font-medium">Price:</span>{' '}
             {formatPrice(pkg.package_price)}
           </div>
           <div>
@@ -426,7 +448,7 @@ function PackageDetails({ package: pkg }: { package: TravelPackages }) {
             <span className="font-medium">Max Persons:</span> {pkg.max_persons}
           </div>
           <div>
-            <span className="font-medium">Images:</span> {pkg.images?.length}{" "}
+            <span className="font-medium">Images:</span> {pkg.images?.length}{' '}
             photos
           </div>
         </div>
@@ -468,7 +490,13 @@ function PackageDetails({ package: pkg }: { package: TravelPackages }) {
               key={index}
               className="aspect-video bg-muted rounded-lg  flex items-center justify-center"
             >
-              <Image src={convertTravelImageUrl(image)} alt="Travel Package Image" width={100} height={100} className="object-cover rounded-lg w-full h-auto" />
+              <Image
+                src={convertTravelImageUrl(image)}
+                alt="Travel Package Image"
+                width={100}
+                height={100}
+                className="object-cover rounded-lg w-full h-auto"
+              />
             </div>
           ))}
         </div>
@@ -477,11 +505,11 @@ function PackageDetails({ package: pkg }: { package: TravelPackages }) {
       <div className="pt-4 border-t">
         <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
           <div>
-            <span className="font-medium">Created:</span>{" "}
+            <span className="font-medium">Created:</span>{' '}
             {formatDate(pkg.created_at)}
           </div>
           <div>
-            <span className="font-medium">Updated:</span>{" "}
+            <span className="font-medium">Updated:</span>{' '}
             {formatDate(pkg.updated_at)}
           </div>
         </div>

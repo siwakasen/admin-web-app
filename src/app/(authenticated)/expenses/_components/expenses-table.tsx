@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Pagination,
   PaginationContent,
@@ -16,10 +16,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Eye,
   Calendar,
@@ -30,7 +30,7 @@ import {
   Trash2,
   MoreVertical,
   Receipt,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -39,18 +39,18 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Expense } from "@/interfaces/expenses.interface";
-import { Meta } from "@/interfaces";
-import { useDeleteExpense } from "@/hooks/expenses.hook";
-import { toast } from "sonner";
-import { redirect } from "next/navigation";
+} from '@/components/ui/dropdown-menu';
+import { Expense } from '@/interfaces/expenses.interface';
+import { Meta } from '@/interfaces';
+import { useDeleteExpense } from '@/hooks/expenses.hook';
+import { toast } from 'sonner';
+import { redirect } from 'next/navigation';
 
 interface ExpensesTableProps {
   expenses: Expense[];
@@ -88,18 +88,18 @@ export function ExpensesTable({
 
   const handleDeleteConfirm = async () => {
     if (!expenseToDelete) return;
-    
+
     try {
       const response = await useDeleteExpense(expenseToDelete.id);
       if ('errors' in response) {
-        toast.error(response.errors?.message || "Failed to delete expense");
+        toast.error(response.errors?.message || 'Failed to delete expense');
       } else {
-        toast.success("Expense deleted successfully!");
+        toast.success('Expense deleted successfully!');
         onRefetch();
       }
     } catch (error) {
-      console.error("Error deleting expense:", error);
-      toast.error("Failed to delete expense");
+      console.error('Error deleting expense:', error);
+      toast.error('Failed to delete expense');
     } finally {
       setDeleteDialogOpen(false);
       setExpenseToDelete(null);
@@ -228,15 +228,19 @@ export function ExpensesTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => toggleRowExpansion(expense.id)}>
+                        <DropdownMenuItem
+                          onClick={() => toggleRowExpansion(expense.id)}
+                        >
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(expense.id)}>
+                        <DropdownMenuItem
+                          onClick={() => handleEdit(expense.id)}
+                        >
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleDeleteClick(expense)}
                           className="text-destructive"
                         >
@@ -267,24 +271,34 @@ export function ExpensesTable({
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => onPageChange(meta.currentPage - 1)}
-                className={!meta.hasPrevPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={
+                  !meta.hasPrevPage
+                    ? 'pointer-events-none opacity-50'
+                    : 'cursor-pointer'
+                }
               />
             </PaginationItem>
-            {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  onClick={() => onPageChange(page)}
-                  isActive={page === meta.currentPage}
-                  className="cursor-pointer"
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
+              (page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => onPageChange(page)}
+                    isActive={page === meta.currentPage}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            )}
             <PaginationItem>
               <PaginationNext
                 onClick={() => onPageChange(meta.currentPage + 1)}
-                className={!meta.hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={
+                  !meta.hasNextPage
+                    ? 'pointer-events-none opacity-50'
+                    : 'cursor-pointer'
+                }
               />
             </PaginationItem>
           </PaginationContent>
@@ -297,7 +311,8 @@ export function ExpensesTable({
           <DialogHeader>
             <DialogTitle>Delete Expense</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{expenseToDelete?.expense_name}"? This action cannot be undone.
+              Are you sure you want to delete "{expenseToDelete?.expense_name}"?
+              This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -353,7 +368,9 @@ function ExpenseDetails({ expense }: { expense: Expense }) {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Name:</span>
-                  <span className="text-sm font-medium">{expense.expense_name}</span>
+                  <span className="text-sm font-medium">
+                    {expense.expense_name}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Amount:</span>
@@ -363,12 +380,14 @@ function ExpenseDetails({ expense }: { expense: Expense }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Date:</span>
-                  <span className="text-sm font-medium">{formatDate(expense.expense_date)}</span>
+                  <span className="text-sm font-medium">
+                    {formatDate(expense.expense_date)}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <h4 className="font-semibold text-sm text-muted-foreground mb-2">
@@ -376,16 +395,28 @@ function ExpenseDetails({ expense }: { expense: Expense }) {
               </h4>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Created:</span>
-                  <span className="text-sm font-medium">{formatDateTime(expense.created_at)}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Created:
+                  </span>
+                  <span className="text-sm font-medium">
+                    {formatDateTime(expense.created_at)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Updated:</span>
-                  <span className="text-sm font-medium">{formatDateTime(expense.updated_at)}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Updated:
+                  </span>
+                  <span className="text-sm font-medium">
+                    {formatDateTime(expense.updated_at)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Created By:</span>
-                  <span className="text-sm font-medium">Employee ID: {expense.created_by}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Created By:
+                  </span>
+                  <span className="text-sm font-medium">
+                    Employee ID: {expense.created_by}
+                  </span>
                 </div>
               </div>
             </div>
@@ -394,4 +425,4 @@ function ExpenseDetails({ expense }: { expense: Expense }) {
       </CardContent>
     </Card>
   );
-} 
+}

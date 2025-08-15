@@ -300,11 +300,11 @@ export function BookingTable({
                             {(() => {
                               const { icon: Icon, color } = getServiceIcon(
                                 booking.package_id,
-                                booking.car_id,
+                                booking.car_id
                               );
                               const serviceName = getServiceName(
                                 booking.package_id,
-                                booking.car_id,
+                                booking.car_id
                               );
                               return (
                                 <>
@@ -528,7 +528,7 @@ export function BookingTable({
                 value={finishStatus}
                 onValueChange={(value) =>
                   setFinishStatus(
-                    value as BookingStatus.COMPLETED | BookingStatus.NO_SHOW,
+                    value as BookingStatus.COMPLETED | BookingStatus.NO_SHOW
                   )
                 }
               >

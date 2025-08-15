@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Pagination,
   PaginationContent,
@@ -16,10 +16,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Eye,
   User,
@@ -33,7 +33,7 @@ import {
   ShieldUser,
   Crown,
   Car,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -42,19 +42,19 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Employee } from "@/interfaces/employees.interface";
-import { Meta } from "@/interfaces";
-import { redirect, useRouter } from "next/navigation";
-import { useDeleteEmployee } from "@/hooks";
-import { toast } from "sonner";
+} from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Employee } from '@/interfaces/employees.interface';
+import { Meta } from '@/interfaces';
+import { redirect, useRouter } from 'next/navigation';
+import { useDeleteEmployee } from '@/hooks';
+import { toast } from 'sonner';
 
 interface EmployeesTableProps {
   employees: Employee[];
@@ -73,7 +73,9 @@ export function EmployeesTable({
 }: EmployeesTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
+    null
+  );
   const router = useRouter();
 
   const toggleRowExpansion = (id: number) => {
@@ -94,21 +96,20 @@ export function EmployeesTable({
     redirect(`/employees/edit/${id}`);
   };
 
-  
   const handleDeleteConfirm = async () => {
     if (!employeeToDelete) return;
-    
+
     try {
-        const response = await useDeleteEmployee(employeeToDelete.id);
-        if('errors' in response) {
-          toast.error(response.errors.message);
-        }
-        if ('message' in response) {
-            toast.success(response.message);
-          onRefetch();
-        }
+      const response = await useDeleteEmployee(employeeToDelete.id);
+      if ('errors' in response) {
+        toast.error(response.errors.message);
+      }
+      if ('message' in response) {
+        toast.success(response.message);
+        onRefetch();
+      }
     } catch (error) {
-      toast.error("Failed to delete employee. Please try again.");
+      toast.error('Failed to delete employee. Please try again.');
     } finally {
       setDeleteDialogOpen(false);
       setEmployeeToDelete(null);
@@ -125,23 +126,21 @@ export function EmployeesTable({
   };
 
   const formatSalary = (salary: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(salary);
   };
 
   const formatRoleName = (roleName: string) => {
-    return roleName
-      .replace(/_/g, ' ')
-      .replace(/^./, (c) => c.toUpperCase());
+    return roleName.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
@@ -184,7 +183,7 @@ export function EmployeesTable({
             ) : (
               employees.map((employee) => (
                 <React.Fragment key={employee.id}>
-                  <TableRow className="hover:bg-muted/50 " >
+                  <TableRow className="hover:bg-muted/50 ">
                     <TableCell>
                       <Button
                         variant="ghost"
@@ -217,13 +216,13 @@ export function EmployeesTable({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {employee.role.id === 1 ? (
-                            <Crown className="h-4 w-4 text-yellow-600" />
+                          <Crown className="h-4 w-4 text-yellow-600" />
                         ) : employee.role.id === 2 ? (
-                            <ShieldUser className="h-4 w-4 text-green-600" />
+                          <ShieldUser className="h-4 w-4 text-green-600" />
                         ) : employee.role.id === 3 ? (
-                            <User className="h-4 w-4 text-blue-600" />
+                          <User className="h-4 w-4 text-blue-600" />
                         ) : (
-                            <Car className="h-4 w-4 text-red-600" />
+                          <Car className="h-4 w-4 text-red-600" />
                         )}
                         <Badge variant="secondary">
                           {formatRoleName(employee.role.role_name)}
@@ -240,49 +239,62 @@ export function EmployeesTable({
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground">
-                        { employee.last_update_password ? formatDate(employee.last_update_password) : "N/A"}
+                        {employee.last_update_password
+                          ? formatDate(employee.last_update_password)
+                          : 'N/A'}
                       </span>
                     </TableCell>
                     <TableCell className="text-right w-[120px]">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-2xl max-h-[80vh]">
-                                <DialogHeader>
-                                  <DialogTitle>{employee.name}</DialogTitle>
-                                  <DialogDescription>
-                                    View detailed information about this employee.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <ScrollArea className="max-h-[60vh]">
-                                  <EmployeeDetails employee={employee} />
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                            
-                            <DropdownMenuItem onClick={() => handleEdit(employee.id)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDeleteClick(employee)}>
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 cursor-pointer"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View
+                              </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[80vh]">
+                              <DialogHeader>
+                                <DialogTitle>{employee.name}</DialogTitle>
+                                <DialogDescription>
+                                  View detailed information about this employee.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <ScrollArea className="max-h-[60vh]">
+                                <EmployeeDetails employee={employee} />
+                              </ScrollArea>
+                            </DialogContent>
+                          </Dialog>
+
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(employee.id)}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600"
+                            onClick={() => handleDeleteClick(employee)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                   {expandedRows.has(employee.id) && (
                     <TableRow>
@@ -296,27 +308,45 @@ export function EmployeesTable({
                                 </h4>
                                 <div className="space-y-2 text-sm">
                                   <div>
-                                    <span className="font-medium">Email:</span> {employee.email}
+                                    <span className="font-medium">Email:</span>{' '}
+                                    {employee.email}
                                   </div>
                                   <div>
-                                    <span className="font-medium">Role:</span> {employee.role.role_name}
+                                    <span className="font-medium">Role:</span>{' '}
+                                    {employee.role.role_name}
                                   </div>
                                   <div>
-                                    <span className="font-medium">Salary:</span> {formatSalary(employee.salary)}
+                                    <span className="font-medium">Salary:</span>{' '}
+                                    {formatSalary(employee.salary)}
                                   </div>
                                 </div>
                               </div>
                               <div>
-                                <h4 className="font-semibold mb-2">Timestamps</h4>
+                                <h4 className="font-semibold mb-2">
+                                  Timestamps
+                                </h4>
                                 <div className="space-y-2 text-sm">
                                   <div>
-                                    <span className="font-medium">Created:</span> {formatDate(employee.created_at)}
+                                    <span className="font-medium">
+                                      Created:
+                                    </span>{' '}
+                                    {formatDate(employee.created_at)}
                                   </div>
                                   <div>
-                                    <span className="font-medium">Updated:</span> {formatDate(employee.updated_at)}
+                                    <span className="font-medium">
+                                      Updated:
+                                    </span>{' '}
+                                    {formatDate(employee.updated_at)}
                                   </div>
                                   <div>
-                                    <span className="font-medium">Last Password Update:</span> {employee.last_update_password ? formatDate(employee.last_update_password) : "N/A"}
+                                    <span className="font-medium">
+                                      Last Password Update:
+                                    </span>{' '}
+                                    {employee.last_update_password
+                                      ? formatDate(
+                                          employee.last_update_password
+                                        )
+                                      : 'N/A'}
                                   </div>
                                 </div>
                               </div>
@@ -337,8 +367,8 @@ export function EmployeesTable({
       {meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {(meta.currentPage - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{" "}
+            Showing {(meta.currentPage - 1) * meta.limit + 1} to{' '}
+            {Math.min(meta.currentPage * meta.limit, meta.totalItems)} of{' '}
             {meta.totalItems} results
           </div>
           <Pagination>
@@ -350,8 +380,8 @@ export function EmployeesTable({
                   }
                   className={
                     !meta.hasPrevPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -378,8 +408,8 @@ export function EmployeesTable({
                   }
                   className={
                     !meta.hasNextPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                      ? 'pointer-events-none opacity-50'
+                      : 'cursor-pointer'
                   }
                 />
               </PaginationItem>
@@ -394,7 +424,8 @@ export function EmployeesTable({
           <DialogHeader>
             <DialogTitle>Delete Employee</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{employeeToDelete?.name}"? This action cannot be undone.
+              Are you sure you want to delete "{employeeToDelete?.name}"? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -413,19 +444,19 @@ export function EmployeesTable({
 
 function EmployeeDetails({ employee }: { employee: Employee }) {
   const formatSalary = (salary: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(salary);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -444,7 +475,8 @@ function EmployeeDetails({ employee }: { employee: Employee }) {
             <span className="font-medium">Role:</span> {employee.role.role_name}
           </div>
           <div>
-            <span className="font-medium">Salary:</span> {formatSalary(employee.salary)}
+            <span className="font-medium">Salary:</span>{' '}
+            {formatSalary(employee.salary)}
           </div>
         </div>
       </div>
@@ -453,13 +485,18 @@ function EmployeeDetails({ employee }: { employee: Employee }) {
         <h3 className="text-lg font-semibold mb-2">Timestamps</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium">Created:</span>  {formatDate(employee.created_at)}
+            <span className="font-medium">Created:</span>{' '}
+            {formatDate(employee.created_at)}
           </div>
           <div>
-            <span className="font-medium">Updated:</span> {formatDate(employee.updated_at)}
+            <span className="font-medium">Updated:</span>{' '}
+            {formatDate(employee.updated_at)}
           </div>
           <div>
-            <span className="font-medium">Last Password Update:</span> {employee.last_update_password ? formatDate(employee.last_update_password) : "N/A"}
+            <span className="font-medium">Last Password Update:</span>{' '}
+            {employee.last_update_password
+              ? formatDate(employee.last_update_password)
+              : 'N/A'}
           </div>
         </div>
       </div>

@@ -1,54 +1,58 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent } from "@/components/ui/card";
-import { TravelPackagesForm } from "@/app/(authenticated)/travel-packages/_components/travel-packages-form";
-import { useCreateTravelPackage } from "@/hooks/travel.hook";
-import { toast } from "sonner";
-import { Check } from "lucide-react";
-import { CreateTravelPackageResponse } from "@/interfaces";
-import { TypeTravelPackageSchema } from "@/lib/validations/travel.schemas";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent } from '@/components/ui/card';
+import { TravelPackagesForm } from '@/app/(authenticated)/travel-packages/_components/travel-packages-form';
+import { useCreateTravelPackage } from '@/hooks/travel.hook';
+import { toast } from 'sonner';
+import { Check } from 'lucide-react';
+import { CreateTravelPackageResponse } from '@/interfaces';
+import { TypeTravelPackageSchema } from '@/lib/validations/travel.schemas';
+import { useRouter } from 'next/navigation';
 
 export default function CreateTravelPackagePage() {
   const currentStep = 1;
   const router = useRouter();
 
-
   const handleTravelPackageSubmit = async (data: TypeTravelPackageSchema) => {
     try {
-      const response:CreateTravelPackageResponse | {status?: number, errors?: any} = await useCreateTravelPackage(data);
-      if('errors' in response) {
-
-        if(response.status === 403) {
-          toast.error("You are not authorized to create a travel package");
+      const response:
+        | CreateTravelPackageResponse
+        | { status?: number; errors?: any } = await useCreateTravelPackage(
+        data
+      );
+      if ('errors' in response) {
+        if (response.status === 403) {
+          toast.error('You are not authorized to create a travel package');
         } else {
-          toast.error(response.errors?.message || "Failed to create travel package");
+          toast.error(
+            response.errors?.message || 'Failed to create travel package'
+          );
         }
         return;
-      } else if('data' in response && 'message' in response) {
+      } else if ('data' in response && 'message' in response) {
         toast.success(response.message);
         router.push(`/travel-packages/edit/${response.data.id}?step=2`);
-      }        
+      }
     } catch (error) {
-      console.error("Error creating travel package:", error);
-      toast.error("Failed to create travel package. Please try again.");
+      console.error('Error creating travel package:', error);
+      toast.error('Failed to create travel package. Please try again.');
     }
   };
 
   const steps = [
     {
       id: 1,
-      title: "Package Details",
-      description: "Provide travel package information",
-      icon: "1",
+      title: 'Package Details',
+      description: 'Provide travel package information',
+      icon: '1',
     },
     {
       id: 2,
-      title: "Upload Images",
-      description: "Add images to your travel package",
-      icon: "2",
+      title: 'Upload Images',
+      description: 'Add images to your travel package',
+      icon: '2',
     },
   ];
 
@@ -66,8 +70,8 @@ export default function CreateTravelPackagePage() {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                         currentStep >= step.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {currentStep > step.id ? (
@@ -80,8 +84,8 @@ export default function CreateTravelPackagePage() {
                       <h3
                         className={`text-sm font-semibold ${
                           currentStep >= step.id
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
                         }`}
                       >
                         {step.title}
@@ -94,9 +98,7 @@ export default function CreateTravelPackagePage() {
                   {index < steps.length - 1 && (
                     <div
                       className={`flex-1 h-0.5 mx-4 transition-colors ${
-                        currentStep > step.id
-                          ? "bg-primary"
-                          : "bg-muted"
+                        currentStep > step.id ? 'bg-primary' : 'bg-muted'
                       }`}
                     />
                   )}

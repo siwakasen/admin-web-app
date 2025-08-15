@@ -52,7 +52,7 @@ export default function EditEmployeePage() {
         | UpdateEmployeeResponse
         | { status?: number; errors?: any } = await useUpdateEmployee(
         employeeId,
-        data,
+        data
       );
       if ('errors' in response) {
         if (response.status === 403) {

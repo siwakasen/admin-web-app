@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateEmployeeSchema } from "@/lib/validations/employees.schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreateEmployeeSchema } from '@/lib/validations/employees.schemas';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -12,16 +12,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+} from '@/components/ui/select';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface EmployeeFormProps {
   onNext: (data: any) => void;
@@ -30,19 +30,19 @@ interface EmployeeFormProps {
 const roles = [
   {
     id: 1,
-    name: "Owner",
+    name: 'Owner',
   },
   {
     id: 2,
-    name: "Admin",
+    name: 'Admin',
   },
   {
     id: 3,
-    name: "Tour Guide",
+    name: 'Tour Guide',
   },
   {
     id: 4,
-    name: "Driver",
+    name: 'Driver',
   },
 ];
 
@@ -53,17 +53,17 @@ export function CreateEmployeeForm({ onNext }: EmployeeFormProps) {
   const form = useForm({
     resolver: zodResolver(CreateEmployeeSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
       role_id: 0,
       salary: 0,
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   const handleRoleChange = (value: string) => {
-    form.setValue("role_id", Number(value));
+    form.setValue('role_id', Number(value));
   };
 
   const onSubmit = async (data: any) => {
@@ -74,11 +74,10 @@ export function CreateEmployeeForm({ onNext }: EmployeeFormProps) {
         role_id: Number(data.role_id),
         salary: Number(data.salary),
       };
-      
-      
+
       onNext(formattedData);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,10 +108,10 @@ export function CreateEmployeeForm({ onNext }: EmployeeFormProps) {
               <FormItem>
                 <FormLabel>Email Address</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="email" 
-                    placeholder="Enter employee email" 
-                    {...field} 
+                  <Input
+                    type="email"
+                    placeholder="Enter employee email"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -128,22 +127,22 @@ export function CreateEmployeeForm({ onNext }: EmployeeFormProps) {
                 <FormLabel>Password</FormLabel>
                 <FormControl>
                   <div className="relative">
-                  <Input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="Enter employee password" 
-                    {...field} 
-                  />
-                  <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-gray-500" />
-                        ) : (
-                          <Eye className="h-4 w-4 text-gray-500" />
-                        )}
-                      </button>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter employee password"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      )}
+                    </button>
                   </div>
                 </FormControl>
                 <FormMessage />
@@ -157,10 +156,18 @@ export function CreateEmployeeForm({ onNext }: EmployeeFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Role</FormLabel>
-                <Select onValueChange={handleRoleChange} defaultValue={field.value.toString()}>
+                <Select
+                  onValueChange={handleRoleChange}
+                  defaultValue={field.value.toString()}
+                >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue>{roles.find(role => role.id.toString() === field.value?.toString())?.name || "Select employee role"}</SelectValue>
+                      <SelectValue>
+                        {roles.find(
+                          (role) =>
+                            role.id.toString() === field.value?.toString()
+                        )?.name || 'Select employee role'}
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -197,11 +204,15 @@ export function CreateEmployeeForm({ onNext }: EmployeeFormProps) {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting} className="cursor-pointer">
-            {isSubmitting ? "Creating..." : "Create Employee"}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="cursor-pointer"
+          >
+            {isSubmitting ? 'Creating...' : 'Create Employee'}
           </Button>
         </div>
       </form>
     </Form>
   );
-} 
+}

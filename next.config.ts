@@ -8,18 +8,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.vulpbox.com",
       },
-      {
-        protocol: "https",
-        hostname: "travel-packages-service.vulpbox.com",
-      },
-      {
-        protocol: "https",
-        hostname: "rent-car-service.vulpbox.com",
-      },
-      {
-        protocol: "https",
-        hostname: "transactions-service.vulpbox.com",
-      },
+      
       {
         protocol: "http",
         hostname: "localhost",
@@ -28,7 +17,6 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: [
     "https://siwakasen.mole-mintaka.ts.net",
-    "https://vulpies.tail66dfd8.ts.net",
     "localhost:3001",
     "localhost:3002",
     "localhost:3003",

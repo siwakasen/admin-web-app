@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { HeaderNavigation } from "@/components/shared/navbar/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { HeaderNavigation } from '@/components/shared/navbar/header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { BookingTable } from "./_components/booking-table";
-import { useGetAllBookings } from "@/hooks/booking.hook";
-import { useGetTravelPackagesHistory, useGetAllCarsHistory } from "@/hooks";
-import { Booking, BookingStatus } from "@/interfaces/booking.interface";
-import { TravelPackages } from "@/interfaces/travel.interface";
-import { Car } from "@/interfaces/car.interfaces";
-import { ToastApi } from "@/lib/helper/toast-api";
+import { BookingTable } from './_components/booking-table';
+import { useGetAllBookings } from '@/hooks/booking.hook';
+import { useGetTravelPackagesHistory, useGetAllCarsHistory } from '@/hooks';
+import { Booking, BookingStatus } from '@/interfaces/booking.interface';
+import { TravelPackages } from '@/interfaces/travel.interface';
+import { Car } from '@/interfaces/car.interfaces';
+import { ToastApi } from '@/lib/helper/toast-api';
 
 export default function BookingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState({
@@ -44,10 +44,10 @@ export default function BookingPage() {
   // Update URL when params change
   const updateURL = (page: number, status: string) => {
     const params = new URLSearchParams();
-    
+
     if (page > 1) params.set('page', page.toString());
     if (status !== 'all') params.set('status', status);
-    
+
     const newURL = params.toString() ? `?${params.toString()}` : '';
     router.push(`/booking${newURL}`, { scroll: false });
   };
@@ -74,7 +74,7 @@ export default function BookingPage() {
           limit: 1000, // Get all packages
           page: 1,
         });
-        
+
         // Fetch cars history
         const carsResponse = await useGetAllCarsHistory({
           limit: 1000, // Get all cars
@@ -84,12 +84,12 @@ export default function BookingPage() {
         if ('data' in travelResponse) {
           setTravelPackages(travelResponse.data);
         }
-        
+
         if ('data' in carsResponse) {
           setCars(carsResponse.data);
         }
       } catch (error) {
-        console.error("Error fetching services:", error);
+        console.error('Error fetching services:', error);
       } finally {
         setServicesLoading(false);
       }
@@ -104,7 +104,7 @@ export default function BookingPage() {
       const response = await useGetAllBookings({
         limit: 10,
         page: currentPage,
-        search: statusFilter === "all" ? "" : statusFilter,
+        search: statusFilter === 'all' ? '' : statusFilter,
       });
       if ('data' in response && 'meta' in response) {
         setBookings(response.data);
@@ -133,9 +133,7 @@ export default function BookingPage() {
           <CardHeader>
             <div className="flex gap-2 justify-between items-center">
               <div>
-                <CardTitle className="text-2xl font-bold">
-                  Bookings
-                </CardTitle>
+                <CardTitle className="text-2xl font-bold">Bookings</CardTitle>
                 <p className="text-muted-foreground">
                   Manage and view all customer bookings
                 </p>
