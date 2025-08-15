@@ -22,13 +22,20 @@ export async function useGetTravelPackages(
 
 export async function useGetTravelPackagesHistory(
   pagination: Pagination
-): Promise<TravelPackagesResponse> {
+): Promise<TravelPackagesResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
-  return await getAllTravelPackagesHistory(pagination, token);
+  try {
+
+    return await getAllTravelPackagesHistory(pagination, token);
+  } catch (error: any) {
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
 }
 
 export async function useGetTravelPackagesDetail(
@@ -48,7 +55,6 @@ export async function useCreateTravelPackage(
 ) {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
@@ -68,7 +74,6 @@ export async function useUpdateTravelPackage(
 ) {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
@@ -88,7 +93,6 @@ export async function useUploadTravelPackageImages(
 ): Promise<UploadTravelPackageImagesResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
@@ -107,7 +111,6 @@ export async function useDeleteTravelPackage(
 ): Promise<DeleteTravelPackageResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
@@ -127,13 +130,11 @@ export async function useDeleteTravelPackageImage(
 ): Promise<EmployeeResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
     return await deleteTravelPackageImage(packageId, imageUrl, token);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
     return {
       status: error.response.status,
       errors: error.response.data,

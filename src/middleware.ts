@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { useGetEmployee, useGetEmployeeFromMiddleware } from "./hooks/employees.hook";
-
+import { jwtDecode } from "jwt-decode";
 export async function middleware(request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-  const { employee } = await useGetEmployeeFromMiddleware();  
+  let decodedToken: {
+    sub: string;
+    type: string;
+    jti: string;
+    iat: number;
+    exp: number;
+  } | null = null;
+
+  if(token){
+    decodedToken = jwtDecode(token);
+  }
 
   if (
     token &&
@@ -16,30 +25,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Redirect unauthenticated users away from /dashboard
-  if (
-    !token &&
-    (request.nextUrl.pathname === "/dashboard" ||
-      request.nextUrl.pathname.startsWith("/employees") ||
-      request.nextUrl.pathname.startsWith("/cars") ||
-      request.nextUrl.pathname.startsWith("/travel")) ||
-      request.nextUrl.pathname.startsWith("/expenses")
-  ) {
+  if(!token && request.nextUrl.pathname !== "/" && request.nextUrl.pathname !== "/forget-password") {
     return NextResponse.redirect(new URL("/", request.url));
   }
-  if(employee?.role.id === 1 && (
+
+  if(decodedToken?.type === "o" && (
     request.nextUrl.pathname.startsWith("/travel-packages") 
     || request.nextUrl.pathname.startsWith("/cars") 
     || request.nextUrl.pathname.startsWith("/expenses")
+    || request.nextUrl.pathname.startsWith("/bookings-adjustments")
   )) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if(employee?.role.id === 2 && (
+  if(decodedToken?.type === "e" && (
     request.nextUrl.pathname.startsWith("/employees") 
+    || request.nextUrl.pathname.startsWith("/refunds")
   )) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
+
 
   return NextResponse.next();
 }
@@ -49,9 +54,17 @@ export const config = {
     "/",
     "/forget-password",
     "/forget-password/:path*",
+
+
     "/dashboard",
+    "/bookings/:path*",
+
     "/cars/:path*",
-    "/employees/:path*",
     "/travel-packages/:path*",
+    "/expenses/:path*",
+    "/bookings-adjustments/:path*",
+
+    "/refunds/:path*",
+    "/employees/:path*",
   ],
 };

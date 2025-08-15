@@ -72,7 +72,6 @@ export default async function BookingDetailsPage({ params }: PageProps) {
   }
 
   const bookingId = Number(id);
-  console.log(bookingId);
 
   // Fetch booking data first
   const bookingResponse = await useGetBookingById(bookingId);

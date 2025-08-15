@@ -8,10 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookingTable } from './_components/booking-table';
 import { useGetAllBookings } from '@/hooks/booking.hook';
 import { useGetTravelPackagesHistory, useGetAllCarsHistory } from '@/hooks';
-import { Booking, BookingStatus } from '@/interfaces/booking.interface';
+import { Booking } from '@/interfaces/booking.interface';
 import { TravelPackages } from '@/interfaces/travel.interface';
 import { Car } from '@/interfaces/car.interfaces';
-import { ToastApi } from '@/lib/helper/toast-api';
 
 export default function BookingPage() {
   const router = useRouter();
@@ -88,8 +87,8 @@ export default function BookingPage() {
         if ('data' in carsResponse) {
           setCars(carsResponse.data);
         }
-      } catch (error) {
-        console.error('Error fetching services:', error);
+      } catch (error: any) {
+        console.error('Error fetching services:', error.response.data);
       } finally {
         setServicesLoading(false);
       }

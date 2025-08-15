@@ -1,10 +1,6 @@
 import { HeaderNavigation } from '@/components/shared/navbar/header';
 import { QuickActions } from '@/components/shared/quick-actions';
 import { useGetEmployee } from '@/hooks/employees.hook';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Clock, Play, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { RedirectType } from 'next/navigation';
 

@@ -2,17 +2,21 @@
 import { ChangePasswordRequest, CreateEmployeeRequest, CreateEmployeeResponse, DeleteEmployeeResponse, Employee, EmployeeResponse, GetAllEmployeesResponse, Pagination, UpdateEmployeeRequest, UpdateEmployeeResponse } from "@/interfaces";
 import { createSession, deleteSession, getToken } from "@/lib/user-provider";
 import {
-  ChangePasswordFormSchemaType,
   ForgetPasswordFormSchemaType,
   LoginFormSchemaType,
 } from "@/lib/validations";
 import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getAvailableEmployeesByDateRange, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
   try {
     const response = await login(formData);
     await createSession(response.data.token);
+    
+    // Revalidate the employee cache when user logs in
+    revalidateTag('employee-middleware');
+    
     return {
       message: response.data.message || "Login successful!",
     };
@@ -33,6 +37,7 @@ export async function useLoginUser(formData: LoginFormSchemaType) {
 }
 
 export async function useGetEmployee() {
+
   try {
     const token = (await getToken()) || "";
     if (!token) {
@@ -106,6 +111,9 @@ export async function useGetAvailableEmployeesByDateRange(
 
 export async function useLogoutUser() {
   await deleteSession();
+  
+  revalidateTag('employee-middleware');
+  
   return {
     message: "Logout successful!",
   };
