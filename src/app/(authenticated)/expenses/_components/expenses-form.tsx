@@ -115,7 +115,7 @@ export function ExpensesForm({
               name="expense_amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount (USD) *</FormLabel>
+                  <FormLabel>Amount (IDR) *</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
