@@ -145,6 +145,9 @@ export async function useLogoutUser() {
     };
   } catch (error: any) {
     console.error('Error message:', `Error on delete session | ${error.message}`);
+    return {
+      message: "Logout failed!",
+    };
   }
 }
 export async function useForgetPasswordUser(
