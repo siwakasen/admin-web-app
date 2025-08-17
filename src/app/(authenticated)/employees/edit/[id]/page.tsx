@@ -5,11 +5,7 @@ import { useParams } from 'next/navigation';
 import { HeaderNavigation } from '@/components/shared/navbar/header';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditEmployeeForm } from '@/app/(authenticated)/employees/_components/edit-employee-form';
-import {
-  useGetAllEmployees,
-  useGetEmployeeById,
-  useUpdateEmployee,
-} from '@/hooks/employees.hook';
+import { useGetEmployeeById, useUpdateEmployee } from '@/hooks/employees.hook';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { UpdateEmployeeResponse, Employee } from '@/interfaces';

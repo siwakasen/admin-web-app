@@ -14,6 +14,7 @@ import {
 import { getToken } from "@/lib/user-provider";
 import { createTravelPackage, deleteTravelPackage, getAllTravelPackages, getTravelPackagesDetail, uploadTravelPackageImages, updateTravelPackage, deleteTravelPackageImage, getAllTravelPackagesHistory, getTravelPackagesHistoryById } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
+import { AxiosError } from "axios";
 export async function useGetTravelPackages(
   pagination: Pagination
 ): Promise<TravelPackagesResponse> {
@@ -31,23 +32,52 @@ export async function useGetTravelPackagesHistory(
 
     return await getAllTravelPackagesHistory(pagination, token);
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
 
 export async function useGetTravelPackagesDetail(
   id: number
-): Promise<TravelPackagesDetailResponse> {
-  return await getTravelPackagesDetail(id);
+): Promise<TravelPackagesDetailResponse | {status?: number, errors?: any}> {
+  try {
+    return await getTravelPackagesDetail(id);
+  } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response?.status,
+      errors: error.response?.data,
+    };
+  }
 }
 
 export async function useGetTravelPackagesHistoryById(
   id: number
-): Promise<TravelPackagesDetailResponse> {
-  return await getTravelPackagesHistoryById(id);
+): Promise<TravelPackagesDetailResponse | {status?: number, errors?: any}> {
+  try {
+    return await getTravelPackagesHistoryById(id);
+  } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response?.status,
+      errors: error.response?.data,
+    };
+  }
 }
 
 export async function useCreateTravelPackage(
@@ -60,10 +90,14 @@ export async function useCreateTravelPackage(
   try {
     return await createTravelPackage(payload, token);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -79,10 +113,14 @@ export async function useUpdateTravelPackage(
   try {
     return await updateTravelPackage(packageId, payload, token);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -98,10 +136,14 @@ export async function useUploadTravelPackageImages(
   try {
     return await uploadTravelPackageImages(packageId, images, token);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 } 
@@ -116,10 +158,14 @@ export async function useDeleteTravelPackage(
   try {
     return await deleteTravelPackage(packageId, token);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -135,9 +181,14 @@ export async function useDeleteTravelPackageImage(
   try {
     return await deleteTravelPackageImage(packageId, imageUrl, token);
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }

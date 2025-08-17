@@ -68,17 +68,20 @@ export default function EditTravelPackagePage() {
         return;
       } else if ('data' in response) {
         setPackageData(response.data);
-        setCurrentStep(2);
-        // Update URL to include step parameter
-        const url = new URL(window.location.href);
-        url.searchParams.set('step', '2');
-        window.history.replaceState({}, '', url.toString());
+        handleChangeStep(2);
         toast.success('Travel package updated successfully!');
       }
     } catch (error) {
       console.error('Error updating travel package:', error);
       toast.error('Failed to update travel package. Please try again.');
     }
+  };
+
+  const handleChangeStep = (step: number) => {
+    setCurrentStep(step);
+    const url = new URL(window.location.href);
+    url.searchParams.set('step', step.toString());
+    window.history.replaceState({}, '', url.toString());
   };
 
   const steps = [
@@ -149,7 +152,7 @@ export default function EditTravelPackagePage() {
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      onClick={() => setCurrentStep(step.id)}
+                      onClick={() => handleChangeStep(step.id)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer ${
                         currentStep >= step.id
                           ? 'bg-primary text-primary-foreground hover:bg-primary/80'

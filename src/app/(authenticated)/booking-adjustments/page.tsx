@@ -96,10 +96,10 @@ export default function BookingAdjustmentsPage() {
             <div className="flex gap-2 justify-between items-center">
               <div>
                 <CardTitle className="text-2xl font-bold">
-                  Booking Adjustments
+                  Reschedule & Cancellation Booking Adjustments
                 </CardTitle>
                 <p className="text-muted-foreground">
-                  Manage and view all booking adjustment requests
+                  Manage and view all reschedule & cancellation requests
                 </p>
               </div>
             </div>

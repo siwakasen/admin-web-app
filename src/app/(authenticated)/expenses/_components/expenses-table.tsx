@@ -51,6 +51,7 @@ import { Meta } from '@/interfaces';
 import { useDeleteExpense } from '@/hooks/expenses.hook';
 import { toast } from 'sonner';
 import { redirect } from 'next/navigation';
+import { ExpenseDetails } from './expense-details';
 
 interface ExpensesTableProps {
   expenses: Expense[];
@@ -116,9 +117,9 @@ export function ExpensesTable({
   };
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('id-ID', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'IDR',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -326,103 +327,5 @@ export function ExpensesTable({
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function ExpenseDetails({ expense }: { expense: Expense }) {
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  return (
-    <Card className="m-4">
-      <CardContent className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
-                Expense Information
-              </h4>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Name:</span>
-                  <span className="text-sm font-medium">
-                    {expense.expense_name}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Amount:</span>
-                  <span className="text-sm font-medium text-green-600">
-                    {formatAmount(expense.expense_amount)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Date:</span>
-                  <span className="text-sm font-medium">
-                    {formatDate(expense.expense_date)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
-                System Information
-              </h4>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Created:
-                  </span>
-                  <span className="text-sm font-medium">
-                    {formatDateTime(expense.created_at)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Updated:
-                  </span>
-                  <span className="text-sm font-medium">
-                    {formatDateTime(expense.updated_at)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Created By:
-                  </span>
-                  <span className="text-sm font-medium">
-                    Employee ID: {expense.created_by}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

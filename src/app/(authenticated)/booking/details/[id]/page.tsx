@@ -88,7 +88,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
     const travelPackageResponse = await useGetTravelPackagesHistoryById(
       booking.package_id
     );
-    if (travelPackageResponse) {
+    if ('data' in travelPackageResponse) {
       travelPackage = travelPackageResponse.data;
     }
   }

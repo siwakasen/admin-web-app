@@ -60,11 +60,7 @@ export default function EditCarPage() {
         return;
       } else if ('data' in response) {
         setCarData(response.data);
-        setCurrentStep(2);
-        // Update URL to include step parameter
-        const url = new URL(window.location.href);
-        url.searchParams.set('step', '2');
-        window.history.replaceState({}, '', url.toString());
+        handleChangeStep(2);
         toast.success('Car updated successfully!');
       }
     } catch (error) {
@@ -73,6 +69,12 @@ export default function EditCarPage() {
     }
   };
 
+  const handleChangeStep = (step: number) => {
+    setCurrentStep(step);
+    const url = new URL(window.location.href);
+    url.searchParams.set('step', step.toString());
+    window.history.replaceState({}, '', url.toString());
+  };
   const steps = [
     {
       id: 1,
@@ -139,7 +141,7 @@ export default function EditCarPage() {
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      onClick={() => setCurrentStep(step.id)}
+                      onClick={() => handleChangeStep(step.id)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer ${
                         currentStep >= step.id
                           ? 'bg-primary text-primary-foreground hover:bg-primary/80'

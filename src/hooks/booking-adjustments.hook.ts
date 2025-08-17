@@ -7,20 +7,24 @@ import { RedirectType } from "next/navigation";
 import { AdjustmentStatus, ApprovementCancellationResponse, BookingAdjustmentResponse, RescheduleAdjustmentResponse } from "@/interfaces/booking-adjustments.interface";
 import { approvementCancellation, getAllBookingAdjustments, rescheduleAdjustment } from "@/services/booking-adjustments.service";
 import { Pagination } from "@/interfaces/common.interface";
+import { AxiosError } from "axios";
 
 export async function useGetAllBookingAdjustments(pagination: Pagination): Promise<BookingAdjustmentResponse | { status?: number; errors?: any }> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
     return await getAllBookingAdjustments(token, pagination);
   } catch (error: any) {
-    console.warn("Hooks:", error.response);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 };
@@ -28,16 +32,19 @@ export async function useGetAllBookingAdjustments(pagination: Pagination): Promi
 export async function useApprovementCancellation(id: number, status: AdjustmentStatus.APPROVED | AdjustmentStatus.REJECTED): Promise<ApprovementCancellationResponse | { status?: number; errors?: any }> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
     return await approvementCancellation(id, token, status);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -45,16 +52,19 @@ export async function useApprovementCancellation(id: number, status: AdjustmentS
 export async function useRescheduleAdjustment(id: number, status: AdjustmentStatus.APPROVED | AdjustmentStatus.REJECTED, employee_id?: string): Promise<RescheduleAdjustmentResponse | { status?: number; errors?: any }> {
   const token = (await getToken()) || "";
   if (!token) {
-    console.warn("No token found");
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
     return await rescheduleAdjustment(id, token, status, employee_id);
   } catch (error: any) {
-    console.warn("Hooks:", error.response.data);
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }

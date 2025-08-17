@@ -8,19 +8,24 @@ import {
 import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getAvailableEmployeesByDateRange, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
 import { revalidateTag } from "next/cache";
+import { AxiosError } from "axios";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
   try {
     const response = await login(formData);
     await createSession(response.data.token);
     
-    // Revalidate the employee cache when user logs in
     revalidateTag('employee-middleware');
     
     return {
       message: response.data.message || "Login successful!",
     };
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     if (error.code == "ECONNREFUSED") {
       return {
         status: 500,
@@ -30,8 +35,8 @@ export async function useLoginUser(formData: LoginFormSchemaType) {
       };
     }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -51,6 +56,11 @@ export async function useGetEmployee() {
 
     return { employee: data };
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     const message: string = error.message;
     if (
       message.includes("Invalid token") ||
@@ -74,7 +84,12 @@ export async function useGetEmployeeFromMiddleware() {
     const { data } = await getEmployee(token);
     return { employee: data };
     
-  } catch (error) {
+  } catch (error: any ) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return { employee: undefined };
   }
 }
@@ -85,9 +100,14 @@ export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | {
     const response = await getAvailableEmployees(token);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -102,21 +122,30 @@ export async function useGetAvailableEmployeesByDateRange(
     const response = await getAvailableEmployeesByDateRange(token, startDate, endDate, roleId);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
 
 export async function useLogoutUser() {
+  try {
   await deleteSession();
   
   revalidateTag('employee-middleware');
   
-  return {
-    message: "Logout successful!",
-  };
+    return {
+      message: "Logout successful!",
+    };
+  } catch (error: any) {
+    console.error('Error message:', `Error on delete session | ${error.message}`);
+  }
 }
 export async function useForgetPasswordUser(
   formData: ForgetPasswordFormSchemaType
@@ -128,9 +157,14 @@ export async function useForgetPasswordUser(
       message: message || "Email to reset password sent!",
     };
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -142,9 +176,14 @@ export async function useChangePasswordUser(
     const { message } = await changePassword(formData);
     return { message };
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -155,9 +194,14 @@ export async function useGetAllEmployees(pagination?: Pagination): Promise<GetAl
     const response = await getAllEmployees(token, pagination);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -168,9 +212,14 @@ export async function useGetEmployeeById(id: number): Promise<EmployeeResponse |
     const response = await getEmployeeById(token, id);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -181,9 +230,14 @@ export async function useCreateEmployee(payload: CreateEmployeeRequest): Promise
     const response = await createEmployee(token, payload);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -194,9 +248,14 @@ export async function useUpdateEmployee(id: number, payload: UpdateEmployeeReque
     const response = await updateEmployee(token, id, payload);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
@@ -207,9 +266,14 @@ export async function useDeleteEmployee(id: number): Promise<DeleteEmployeeRespo
     const response = await deleteEmployee(token, id);
     return response;
   } catch (error: any) {
+    if(error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
     return {
-      status: error.response.status,
-      errors: error.response.data,
+      status: error.response?.status,
+      errors: error.response?.data,
     };
   }
 }
