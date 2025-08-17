@@ -7,7 +7,7 @@ import {
 } from "@/lib/validations";
 import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getAvailableEmployeesByDateRange, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
 import { redirect, RedirectType } from "next/navigation";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import { AxiosError } from "axios";
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
@@ -15,7 +15,7 @@ export async function useLoginUser(formData: LoginFormSchemaType) {
     const response = await login(formData);
     await createSession(response.data.token);
     
-    revalidateTag('employee-middleware');
+    revalidateTag('session');
     
     return {
       message: response.data.message || "Login successful!",
@@ -40,62 +40,55 @@ export async function useLoginUser(formData: LoginFormSchemaType) {
     };
   }
 }
+const getCachedEmployee = unstable_cache(
+  async (token: string) => {
+    try {
+      
+      const { data } = await getEmployee(token);
+
+      if(!data){
+        redirect("/redirect/reset-cookie", RedirectType.replace);
+      }
+
+      return { employee: data };
+    } catch (error: any) {
+      if(error instanceof AxiosError) {
+        console.error('Axios response message:', error.response?.data.message);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      const message: string = error.message;
+      if (
+        message.includes("Invalid token") ||
+        error.code == "ERR_BAD_REQUEST" ||
+        error.code == "ECONNREFUSED" ||
+        error.code == "ERR_NETWORK" ||
+        error.response?.data.message.includes("Invalid token")
+      ) {
+        redirect("/redirect/reset-cookie", RedirectType.replace);
+      }
+      return { employee: undefined };
+    }
+  },
+  ['employee-session'],
+  {
+    tags: ['session'],
+    revalidate: 3600, 
+  }
+);
 
 export async function useGetEmployee() {
-
-  try {
-    const token = (await getToken()) || "";
-    if (!token) {
-      return { employee: undefined };
-    }
-    const { data } = await getEmployee(token);
-
-    if(!data){
-      redirect("/redirect/reset-cookie", RedirectType.replace);
-    }
-
-    return { employee: data };
-  } catch (error: any) {
-    if(error instanceof AxiosError) {
-      console.error('Axios response message:', error.response?.data.message);
-    } else {
-      console.error('Error message:', error.message);
-    }
-    const message: string = error.message;
-    if (
-      message.includes("Invalid token") ||
-      error.code == "ERR_BAD_REQUEST" ||
-      error.code == "ECONNREFUSED" ||
-      error.code == "ERR_NETWORK" ||
-      error.response?.data.message.includes("Invalid token")
-    ) {
-      redirect("/redirect/reset-cookie", RedirectType.replace);
-    }
+  const token = (await getToken()) || "";
+  if (!token) {
     return { employee: undefined };
   }
+  return getCachedEmployee(token);
 }
 
-export async function useGetEmployeeFromMiddleware() {
-  try {
-    const token = (await getToken()) || "";
-    if (!token) {
-      return { employee: undefined };
-    }
-    const { data } = await getEmployee(token);
-    return { employee: data };
-    
-  } catch (error: any ) {
-    if(error instanceof AxiosError) {
-      console.error('Axios response message:', error.response?.data.message);
-    } else {
-      console.error('Error message:', error.message);
-    }
-    return { employee: undefined };
-  }
-}
 
 export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | { status?: number; errors?: any }> {
   try {
+
     const token = (await getToken()) || "";
     const response = await getAvailableEmployees(token);
     return response;
@@ -138,7 +131,7 @@ export async function useLogoutUser() {
   try {
   await deleteSession();
   
-  revalidateTag('employee-middleware');
+  revalidateTag('session');
   
     return {
       message: "Logout successful!",

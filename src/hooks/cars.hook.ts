@@ -13,7 +13,6 @@ export async function useGetAllCars(pagination: Pagination): Promise<CarsRespons
 export async function useGetAllCarsHistory(pagination: Pagination): Promise<CarsResponse | {status?: number, errors?: any}> {
   const token = (await getToken()) || "";
   if (!token) {
-     
     redirect("/redirect/reset-cookie", RedirectType.replace);
   }
   try {
