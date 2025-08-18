@@ -1,8 +1,6 @@
-import React from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
@@ -15,29 +13,17 @@ import {
   Clock,
   Palmtree,
   Users,
-  AlertCircle,
-  X,
-  ArrowLeft,
   CreditCard,
   CarIcon,
 } from 'lucide-react';
 import {
-  CustomersDetailResponse,
   Employee,
-  EmployeeResponse,
-  Booking,
   TravelPackages,
   Car,
   BookingStatus,
   Customer,
 } from '@/interfaces';
 import { getToken } from '@/lib/user-provider';
-import { getBookingById } from '@/services/bookings.service';
-import {
-  getCustomersById,
-  getCustomersImage,
-} from '@/services/customers.service';
-import { getAvailableEmployeesByDateRange } from '@/services/employees.service';
 import { useGetBookingById } from '@/hooks/booking.hook';
 import {
   useGetCustomersById,
@@ -47,37 +33,56 @@ import {
   useGetAvailableEmployeesByDateRange,
   useGetEmployeeById,
 } from '@/hooks/employees.hook';
-import {
-  useGetCarDetail,
-  useGetTravelPackagesDetail,
-  useGetTravelPackagesHistory,
-  useGetTravelPackagesHistoryById,
-} from '@/hooks';
+import { useGetTravelPackagesHistoryById } from '@/hooks';
 import { getCarsDetailHistoryById } from '@/services/cars.service';
-import { convertCarImageUrl } from '@/lib/helper/images-url';
+import {
+  convertCarImageUrl,
+  convertTravelImageUrl,
+} from '@/lib/helper/images-url';
 import Action from './_components/action';
 import IdentityImagesZoom from './_components/identity-images-zoom';
 
 interface PageProps {
   params: Promise<{
-    id: string;
+    id: number;
   }>;
 }
 
 export default async function BookingDetailsPage({ params }: PageProps) {
-  const { id } = await params;
+  const { id: bookingId } = await params;
   const token = await getToken();
   if (!token) {
     redirect('/redirect/reset-cookie');
   }
-
-  const bookingId = Number(id);
 
   // Fetch booking data first
   const bookingResponse = await useGetBookingById(bookingId);
   if (!bookingResponse || !('data' in bookingResponse)) {
     notFound();
   }
+
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case BookingStatus.CONFIRMED:
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case BookingStatus.ONGOING:
+        return 'bg-cyan-100 text-cyan-800 border-cyan-200';
+      case BookingStatus.COMPLETED:
+        return 'bg-green-100 text-green-800 border-green-200';
+      case BookingStatus.CANCELLED:
+        return 'bg-red-100 text-red-800 border-red-200';
+      case BookingStatus.WAITING_PAYMENT:
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case BookingStatus.WAITING_CONFIRMATION:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case BookingStatus.NO_SHOW:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case BookingStatus.PAYMENT_FAILED:
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
 
   const booking = bookingResponse.data;
   // Fetch customer data
@@ -104,7 +109,6 @@ export default async function BookingDetailsPage({ params }: PageProps) {
   let employee: Employee | null = null;
   if (booking.employee_id) {
     const employeeResponse = await useGetEmployeeById(booking.employee_id);
-    console.log(employeeResponse);
     if (employeeResponse && 'data' in employeeResponse) {
       employee = employeeResponse.data;
     }
@@ -270,7 +274,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                       {travelPackage.images.map((image, index) => (
                         <div key={index} className="relative group">
                           <img
-                            src={image}
+                            src={convertTravelImageUrl(image)}
                             alt={`Package Image ${index + 1}`}
                             className="max-h-32 w-auto object-contain rounded-lg border shadow-sm  hover:shadow-lg transition-all duration-200 hover:scale-105"
                           />
@@ -451,7 +455,12 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   Status
                 </Label>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">{booking.status}</span>
+                  <Badge
+                    variant="outline"
+                    className={getStatusBadgeClass(booking.status)}
+                  >
+                    {booking.status.replace(/_/g, ' ')}
+                  </Badge>
                 </div>
               </div>
               {/* With Driver */}
@@ -630,10 +639,12 @@ export default async function BookingDetailsPage({ params }: PageProps) {
         )}
 
         {/* Identity Images with Zoom */}
-        <IdentityImagesZoom
-          identityImages={identityImages}
-          imageLoadErrors={imageLoadErrors}
-        />
+        {booking.car_id && (
+          <IdentityImagesZoom
+            identityImages={identityImages}
+            imageLoadErrors={imageLoadErrors}
+          />
+        )}
 
         {/* Action Component */}
         {booking.status === BookingStatus.WAITING_CONFIRMATION && (
