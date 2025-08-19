@@ -63,7 +63,7 @@ export default function Action({
           console.log('employee assigned successfully');
           toast.success(response.message || 'Employee assigned successfully');
         }
-        router.push('/booking?status=WAITING_CONFIRMATION');
+        router.push('/booking');
       } else {
         console.log('confirming booking without driver');
         const response = await useConfirmBookingWithoutDriver(booking.id);
@@ -74,7 +74,7 @@ export default function Action({
           console.log('booking confirmed successfully');
           toast.success(response.message || 'Booking confirmed successfully');
         }
-        router.push('/booking?status=WAITING_CONFIRMATION');
+        router.push('/booking');
       }
     } catch (error) {
       console.log('error', error);

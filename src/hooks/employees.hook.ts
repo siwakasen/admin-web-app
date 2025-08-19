@@ -108,11 +108,12 @@ export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | {
 export async function useGetAvailableEmployeesByDateRange(
   startDate: string,
   endDate: string,
-  roleId?: number
+  roleId: number,
+  bookingId: number
 ): Promise<GetAllEmployeesResponse | { status?: number; errors?: any }> {
   try {
     const token = (await getToken()) || "";
-    const response = await getAvailableEmployeesByDateRange(token, startDate, endDate, roleId);
+    const response = await getAvailableEmployeesByDateRange(token, startDate, endDate, roleId, bookingId);
     return response;
   } catch (error: any) {
     if(error instanceof AxiosError) {

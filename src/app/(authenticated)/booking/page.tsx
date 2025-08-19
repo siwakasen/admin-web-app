@@ -11,6 +11,7 @@ import { useGetTravelPackagesHistory, useGetAllCarsHistory } from '@/hooks';
 import { Booking } from '@/interfaces/booking.interface';
 import { TravelPackages } from '@/interfaces/travel.interface';
 import { Car } from '@/interfaces/car.interfaces';
+import { ToastApi } from '@/lib/helper/toast-api';
 
 export default function BookingPage() {
   const router = useRouter();
@@ -105,6 +106,7 @@ export default function BookingPage() {
         page: currentPage,
         search: statusFilter === 'all' ? '' : statusFilter,
       });
+      ToastApi(response);
       if ('data' in response && 'meta' in response) {
         setBookings(response.data);
         setMeta(response.meta);

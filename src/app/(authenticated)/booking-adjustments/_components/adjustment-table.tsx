@@ -126,7 +126,8 @@ export function BookingAdjustmentTable({
         const employeesResponse = await useGetAvailableEmployeesByDateRange(
           startDate,
           endDate,
-          roleId
+          roleId,
+          adjustment.booking.id
         );
 
         if ('data' in employeesResponse) {
@@ -161,17 +162,6 @@ export function BookingAdjustmentTable({
         );
       }
       if (adjustmentToProcess.request_type === RequestType.RESCHEDULE) {
-        if (
-          !selectedEmployeeId &&
-          ((adjustmentToProcess.booking.car_id &&
-            adjustmentToProcess.booking.with_driver) ||
-            adjustmentToProcess.booking.package_id)
-        ) {
-          toast.error(
-            'Please select an employee before approving the reschedule request'
-          );
-          return;
-        }
         response = await useRescheduleAdjustment(
           adjustmentToProcess.id,
           AdjustmentStatus.APPROVED,
@@ -427,7 +417,7 @@ export function BookingAdjustmentTable({
 
                           {(adjustment.status === AdjustmentStatus.PENDING ||
                             adjustment.status ===
-                              AdjustmentStatus.WAITING_REASSIGNMENT) && (
+                              AdjustmentStatus.WAITING_RECONFIRMATION) && (
                             <>
                               <DropdownMenuItem
                                 className="text-green-600 focus:text-green-600"
@@ -625,8 +615,12 @@ export function BookingAdjustmentTable({
 
           {/* Employee Assignment for Reschedule Requests */}
           {adjustmentToProcess?.request_type === RequestType.RESCHEDULE &&
-            ((adjustmentToProcess.booking.car_id &&
-              adjustmentToProcess.booking.with_driver) ||
+            ((adjustmentToProcess.booking.with_driver &&
+              adjustmentToProcess.additional_price == 0) ||
+              (adjustmentToProcess.additional_price > 0 &&
+                adjustmentToProcess.booking.with_driver &&
+                adjustmentToProcess.status ===
+                  AdjustmentStatus.WAITING_RECONFIRMATION) ||
               adjustmentToProcess.booking.package_id) && (
               <div className="space-y-4 py-4">
                 <div className="space-y-2">

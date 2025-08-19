@@ -93,18 +93,15 @@ export const getAvailableEmployeesByDateRange = async (
   token: string, 
   startDate: string, 
   endDate: string,
-  roleId?: number
+  roleId: number,
+  bookingId: number
 ): Promise<GetAllEmployeesResponse> => {
   const api = await createApiInstance(
     process.env.NEXT_PUBLIC_EMPLOYEES_API_URL,
     token
   );
   
-  let url = `/employees/available?start_date=${startDate}&end_date=${endDate}`;
-  if (roleId) {
-    url += `&role_id=${roleId}`;
-  }
-  
+  let url = `/employees/available?start_date=${startDate}&end_date=${endDate}&booking_id=${bookingId}&role_id=${roleId}`;
   const response = await api.get(url);
   return response.data;
 };

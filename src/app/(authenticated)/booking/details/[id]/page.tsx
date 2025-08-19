@@ -157,12 +157,20 @@ export default async function BookingDetailsPage({ params }: PageProps) {
     const employeesResponse = await useGetAvailableEmployeesByDateRange(
       booking.start_date,
       booking.end_date,
-      requiredRole
+      requiredRole,
+      bookingId
     );
     if (employeesResponse && 'data' in employeesResponse) {
       availableEmployees = employeesResponse.data;
     }
   }
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(price);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -224,7 +232,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   </Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-mono text-green-600">
-                      Rp{travelPackage.package_price.toLocaleString()}
+                      {formatPrice(travelPackage.package_price)}
                     </span>
                   </div>
                 </div>
@@ -346,7 +354,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   </Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-mono text-green-600">
-                      Rp{car.price_per_day.toLocaleString()}
+                      {formatPrice(car.price_per_day)}
                     </span>
                   </div>
                 </div>
