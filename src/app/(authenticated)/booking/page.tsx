@@ -106,7 +106,6 @@ export default function BookingPage() {
         page: currentPage,
         search: statusFilter === 'all' ? '' : statusFilter,
       });
-      ToastApi(response);
       if ('data' in response && 'meta' in response) {
         setBookings(response.data);
         setMeta(response.meta);

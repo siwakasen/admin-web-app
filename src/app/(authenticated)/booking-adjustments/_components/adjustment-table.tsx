@@ -68,6 +68,7 @@ import {
 } from '@/hooks/booking-adjustments.hook';
 import { useGetAvailableEmployeesByDateRange } from '@/hooks/employees.hook';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface BookingAdjustmentTableProps {
   adjustments: BookingAdjustmentWithBooking[];
@@ -97,6 +98,7 @@ export function BookingAdjustmentTable({
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
   const [availableEmployees, setAvailableEmployees] = useState<any[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const router = useRouter();
 
   const toggleRowExpansion = (id: number) => {
     const newExpanded = new Set(expandedRows);
@@ -409,9 +411,13 @@ export function BookingAdjustmentTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => toggleRowExpansion(adjustment.id)}
+                            onClick={() =>
+                              router.push(
+                                `/booking-adjustments/details/${adjustment.id}`
+                              )
+                            }
                           >
-                            <Eye className="h-4 w-4 mr-2" />
+                            <FileText className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
 
@@ -469,35 +475,7 @@ export function BookingAdjustmentTable({
                                   </div>
                                 </div>
                               </div>
-                              <div>
-                                <h4 className="font-semibold mb-2">
-                                  Date Changes
-                                </h4>
-                                <div className="space-y-2 text-sm">
-                                  <div>
-                                    <span className="font-medium">
-                                      New Start Date:
-                                    </span>{' '}
-                                    {formatDate(adjustment.new_start_date)}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">
-                                      New End Date:
-                                    </span>{' '}
-                                    {formatDate(
-                                      adjustment.new_end_date
-                                        ? adjustment.new_end_date
-                                        : ''
-                                    )}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">
-                                      Additional Price:
-                                    </span>{' '}
-                                    {formatPrice(adjustment.additional_price)}
-                                  </div>
-                                </div>
-                              </div>
+
                               <div>
                                 <h4 className="font-semibold mb-2">
                                   Booking Information
@@ -531,6 +509,35 @@ export function BookingAdjustmentTable({
                                       Booking information not available
                                     </div>
                                   )}
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold mb-2">
+                                  Date Changes
+                                </h4>
+                                <div className="space-y-2 text-sm">
+                                  <div>
+                                    <span className="font-medium">
+                                      New Start Date:
+                                    </span>{' '}
+                                    {formatDate(adjustment.new_start_date)}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">
+                                      New End Date:
+                                    </span>{' '}
+                                    {formatDate(
+                                      adjustment.new_end_date
+                                        ? adjustment.new_end_date
+                                        : ''
+                                    )}
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">
+                                      Additional Price:
+                                    </span>{' '}
+                                    {formatPrice(adjustment.additional_price)}
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -607,7 +614,7 @@ export function BookingAdjustmentTable({
           <DialogHeader>
             <DialogTitle>Approve Adjustment Request</DialogTitle>
             <DialogDescription>
-              Are you sure you want to approve adjustment request #
+              Are you sure you want to approve this adjustment request #
               {adjustmentToProcess?.id}? This will approve the{' '}
               {adjustmentToProcess?.request_type?.toLowerCase()} request.
             </DialogDescription>

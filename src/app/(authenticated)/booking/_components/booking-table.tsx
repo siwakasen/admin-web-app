@@ -43,6 +43,7 @@ import {
   CheckCircle,
   XCircle,
   Users,
+  FileText,
 } from 'lucide-react';
 import {
   Dialog,
@@ -253,7 +254,7 @@ export function BookingTable({
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead className="w-[80px]">ID</TableHead>
-              <TableHead>Service</TableHead>
+              <TableHead>Service Type</TableHead>
               <TableHead>Dates</TableHead>
               <TableHead>Pickup Time</TableHead>
               <TableHead>Total Price</TableHead>
@@ -367,7 +368,7 @@ export function BookingTable({
                           <DropdownMenuItem
                             onClick={() => handleViewDetails(booking.id)}
                           >
-                            <Eye className="h-4 w-4 mr-2" />
+                            <FileText className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
                           {booking.status === BookingStatus.ONGOING && (
@@ -409,26 +410,20 @@ export function BookingTable({
                                   Booking Info
                                 </h4>
                                 <div className="space-y-2 text-sm">
-                                  <div>
-                                    <span className="font-medium">
-                                      With Driver:
-                                    </span>{' '}
-                                    {booking.with_driver ? 'Yes' : 'No'}
-                                  </div>
+                                  {booking.car_id && (
+                                    <div>
+                                      <span className="font-medium">
+                                        With Driver:
+                                      </span>{' '}
+                                      {booking.with_driver ? 'Yes' : 'No'}
+                                    </div>
+                                  )}
                                   {booking.number_of_persons && (
                                     <div className="flex items-center gap-2">
                                       <Users className="h-4 w-4 text-green-600" />
                                       <span>
                                         {booking.number_of_persons} persons
                                       </span>
-                                    </div>
-                                  )}
-                                  {booking.employee_id && (
-                                    <div>
-                                      <span className="font-medium">
-                                        Employee:
-                                      </span>{' '}
-                                      #{booking.employee_id}
                                     </div>
                                   )}
                                 </div>

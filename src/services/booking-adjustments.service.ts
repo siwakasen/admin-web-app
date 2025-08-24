@@ -1,7 +1,7 @@
 'use server';
 import { Pagination } from "@/interfaces/common.interface";
 import { createApiInstance } from "./api";
-import { AdjustmentStatus, ApprovementCancellationResponse, BookingAdjustmentResponse, RescheduleAdjustmentResponse } from "@/interfaces/booking-adjustments.interface";
+import { AdjustmentStatus, ApprovementCancellationResponse, BookingAdjustmentDetailsResponse, BookingAdjustmentResponse, RescheduleAdjustmentResponse } from "@/interfaces/booking-adjustments.interface";
 import { AxiosResponse } from "axios";
 
 export async function getAllBookingAdjustments(
@@ -19,6 +19,19 @@ export async function getAllBookingAdjustments(
   }
 
   const response: AxiosResponse = await api.get(url);
+  return response.data;
+}
+
+export async function getBookingAdjustmentById(
+  id: number,
+  token: string
+): Promise<BookingAdjustmentDetailsResponse> {
+  const api = await createApiInstance(
+    process.env.NEXT_PUBLIC_BOOKINGS_API_URL,
+    token
+  );
+
+  const response: AxiosResponse = await api.get(`/bookings/adjustments/${id}`);
   return response.data;
 }
 

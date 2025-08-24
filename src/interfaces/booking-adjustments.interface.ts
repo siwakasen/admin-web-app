@@ -1,12 +1,12 @@
-import { Booking } from "./booking.interface";
+import { Booking, BookingWithoutAdjustments } from "./booking.interface";
 import { Meta } from "./common.interface";
 export interface BookingAdjustment {
     id: number
     request_type: string
     status: string
     reason: string
-    new_start_date: any
-    new_end_date: any
+    new_start_date: string
+    new_end_date: string
     additional_price: number
     created_at: string
     updated_at: string
@@ -30,6 +30,11 @@ export interface BookingAdjustment {
     meta: Meta
   }
 
+  export interface BookingAdjustmentDetailsResponse {
+    data: BookingAdjustmentWithBooking
+    message: string
+  }
+
   export interface ApprovementCancellationResponse {
     data: any
     message: string
@@ -40,12 +45,12 @@ export interface BookingAdjustment {
     request_type: string
     status: string
     reason: string
-    new_start_date: any
-    new_end_date: any
+    new_start_date: string
+    new_end_date: string
     additional_price: number
     created_at: string
     updated_at: string
-    booking: Booking
+    booking: BookingWithoutAdjustments
   }
 
   export interface RescheduleAdjustmentResponse {

@@ -2,7 +2,6 @@ import { notFound, redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 
 import {
   User,
@@ -15,6 +14,8 @@ import {
   Users,
   CreditCard,
   CarIcon,
+  FileText,
+  XCircle,
 } from 'lucide-react';
 import {
   Employee,
@@ -24,8 +25,14 @@ import {
   Customer,
   PaymentStatus,
 } from '@/interfaces';
+import {
+  BookingAdjustmentWithBooking,
+  BookingAdjustmentDetailsResponse,
+  AdjustmentStatus,
+  RequestType,
+} from '@/interfaces/booking-adjustments.interface';
 import { getToken } from '@/lib/user-provider';
-import { useGetBookingById } from '@/hooks/booking.hook';
+import { useGetBookingAdjustmentById } from '@/hooks/booking-adjustments.hook';
 import {
   useGetCustomersById,
   useGetCustomersImage,
@@ -40,8 +47,8 @@ import {
   convertCarImageUrl,
   convertTravelImageUrl,
 } from '@/lib/helper/images-url';
-import Action from './_components/action';
-import IdentityImagesZoom from './_components/identity-images-zoom';
+import IdentityImagesZoom from '../../../booking/details/[id]/_components/identity-images-zoom';
+import AdjustmentActions from './_components/adjustment-actions';
 
 interface PageProps {
   params: Promise<{
@@ -49,20 +56,46 @@ interface PageProps {
   }>;
 }
 
-export default async function BookingDetailsPage({ params }: PageProps) {
-  const { id: bookingId } = await params;
+export default async function BookingAdjustmentDetailsPage({
+  params,
+}: PageProps) {
+  const { id: adjustmentId } = await params;
   const token = await getToken();
   if (!token) {
     redirect('/redirect/reset-cookie');
   }
 
-  // Fetch booking data first
-  const bookingResponse = await useGetBookingById(bookingId);
-  if (!bookingResponse || !('data' in bookingResponse)) {
+  // Fetch adjustment data first
+  const adjustmentResponse = await useGetBookingAdjustmentById(adjustmentId);
+  if (!adjustmentResponse || !('data' in adjustmentResponse)) {
     notFound();
   }
 
+  const adjustment: BookingAdjustmentWithBooking = (
+    adjustmentResponse as BookingAdjustmentDetailsResponse
+  ).data;
+  const booking = adjustment.booking;
+
   const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case AdjustmentStatus.PENDING:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case AdjustmentStatus.WAITING_PAYMENT:
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case AdjustmentStatus.WAITING_RECONFIRMATION:
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case AdjustmentStatus.APPROVED:
+        return 'bg-green-100 text-green-800 border-green-200';
+      case AdjustmentStatus.REJECTED:
+        return 'bg-red-100 text-red-800 border-red-200';
+      case AdjustmentStatus.EXPIRED:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getBookingStatusBadgeClass = (status: string) => {
     switch (status) {
       case BookingStatus.CONFIRMED:
         return 'bg-blue-100 text-blue-800 border-blue-200';
@@ -85,8 +118,18 @@ export default async function BookingDetailsPage({ params }: PageProps) {
     }
   };
 
-  const booking = bookingResponse.data;
-  // Fetch customer data
+  const getRequestTypeIcon = (requestType: string) => {
+    switch (requestType) {
+      case RequestType.CANCELLATION:
+        return { icon: XCircle, color: 'text-red-600' };
+      case RequestType.RESCHEDULE:
+        return { icon: Calendar, color: 'text-blue-600' };
+      default:
+        return { icon: FileText, color: 'text-gray-600' };
+    }
+  };
+
+  // Fetch related data
   const customerResponse = await useGetCustomersById(booking.customer_id);
 
   let travelPackage: TravelPackages | null = null;
@@ -146,20 +189,27 @@ export default async function BookingDetailsPage({ params }: PageProps) {
     }
   }
 
-  // Determine if we need employee assignment
+  // Determine if we need employee assignment for reschedule
   const needsEmployeeAssignment = Boolean(
-    booking.package_id || (booking.car_id && booking.with_driver)
+    adjustment.request_type === RequestType.RESCHEDULE &&
+      (booking.package_id || (booking.car_id && booking.with_driver))
   );
-  const requiredRole = booking.package_id ? 3 : 4; // Role 3 for travel package, Role 4 for driver
+  const requiredRole = booking.package_id ? 3 : 4;
 
-  // Fetch available employees if needed
+  // Fetch available employees if needed for reschedule
   let availableEmployees: Employee[] = [];
-  if (needsEmployeeAssignment) {
+  if (
+    needsEmployeeAssignment &&
+    adjustment.request_type === RequestType.RESCHEDULE
+  ) {
+    const startDate = adjustment.new_start_date || booking.start_date;
+    const endDate = adjustment.new_end_date || booking.end_date;
+
     const employeesResponse = await useGetAvailableEmployeesByDateRange(
-      booking.start_date,
-      booking.end_date,
+      startDate,
+      endDate,
       requiredRole,
-      bookingId
+      booking.id
     );
     if (employeesResponse && 'data' in employeesResponse) {
       availableEmployees = employeesResponse.data;
@@ -173,20 +223,115 @@ export default async function BookingDetailsPage({ params }: PageProps) {
     }).format(price);
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Confirm Booking</h1>
+            <h1 className="text-3xl font-bold">Adjustment Request Details</h1>
             <p className="text-muted-foreground">
-              Review customer details and confirm the booking
+              Review and process the adjustment request
             </p>
           </div>
         </div>
 
-        {/* Package Details */}
+        {/* Adjustment Request Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {(() => {
+                const { icon: Icon, color } = getRequestTypeIcon(
+                  adjustment.request_type
+                );
+                return (
+                  <div className="flex items-center gap-2">
+                    <Icon className={`h-4 w-4 ${color}`} />
+                    <span className="text-sm">{adjustment.request_type}</span>
+                  </div>
+                );
+              })()}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Request ID
+                </Label>
+                <p className="text-sm font-mono">#{adjustment.id}</p>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Status
+                </Label>
+                <Badge
+                  variant="outline"
+                  className={getStatusBadgeClass(adjustment.status)}
+                >
+                  {adjustment.status.replace(/_/g, ' ')}
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Created At
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {formatDate(adjustment.created_at)}
+                  </span>
+                </div>
+              </div>
+              {adjustment.additional_price !== 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Additional Price
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-mono text-green-600`}>
+                      {adjustment.additional_price > 0 ? '+' : ''}
+                      {formatPrice(adjustment.additional_price)}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {adjustment.reason && (
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Reason
+                  </Label>
+                  <p className="text-sm">{adjustment.reason}</p>
+                </div>
+              )}
+              {adjustment.request_type === RequestType.RESCHEDULE && (
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    New Dates
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm">
+                      {formatDate(adjustment.new_start_date)} -{' '}
+                      {formatDate(adjustment.new_end_date)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Travel Package Details */}
         {travelPackage && (
           <Card>
             <CardHeader>
@@ -285,7 +430,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                           <img
                             src={convertTravelImageUrl(image)}
                             alt={`Package Image ${index + 1}`}
-                            className="max-h-32 w-auto object-contain rounded-lg border shadow-sm  hover:shadow-lg transition-all duration-200 hover:scale-105"
+                            className="max-h-32 w-auto object-contain rounded-lg border shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-105"
                           />
                         </div>
                       ))}
@@ -393,7 +538,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                         <img
                           src={convertCarImageUrl(car.car_image)}
                           alt={car.car_name}
-                          className="max-h-48 w-auto object-contain rounded-lg border shadow-sm  hover:shadow-lg transition-all duration-200 hover:scale-105"
+                          className="max-h-48 w-auto object-contain rounded-lg border shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-105"
                         />
                       </div>
                     </div>
@@ -414,7 +559,6 @@ export default async function BookingDetailsPage({ params }: PageProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Service Type */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
                   Service Type
@@ -436,43 +580,39 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   )}
                 </div>
               </div>
-              {/* Dates */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
-                  Dates
+                  Original Dates
                 </Label>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <p className="text-sm">
-                    {new Date(booking.start_date).toLocaleDateString()} -{' '}
-                    {new Date(booking.end_date).toLocaleDateString()}
+                    {formatDate(booking.start_date)} -{' '}
+                    {formatDate(booking.end_date)}
                   </p>
                 </div>
               </div>
-              {/* Booking ID */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
                   Booking ID
                 </Label>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono">{booking.id}</span>
+                  <span className="text-sm font-mono">#{booking.id}</span>
                 </div>
               </div>
-              {/* Status */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
-                  Status
+                  Booking Status
                 </Label>
                 <div className="flex items-center gap-2">
                   <Badge
                     variant="outline"
-                    className={getStatusBadgeClass(booking.status)}
+                    className={getBookingStatusBadgeClass(booking.status)}
                   >
                     {booking.status.replace(/_/g, ' ')}
                   </Badge>
                 </div>
               </div>
-              {/* With Driver */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
                   With Driver
@@ -483,7 +623,6 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   </span>
                 </div>
               </div>
-              {/* Employee */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
                   Assigned Employee
@@ -496,8 +635,6 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   </span>
                 </div>
               </div>
-
-              {/* Pickup Location */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
                   Pickup Location
@@ -509,20 +646,18 @@ export default async function BookingDetailsPage({ params }: PageProps) {
                   </span>
                 </div>
               </div>
-              {/* Total Price */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
-                  Total Price
+                  Original Total Price
                 </Label>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-mono">
                     {booking.total_price
-                      ? `$${booking.total_price.toLocaleString()}`
+                      ? formatPrice(booking.total_price)
                       : 'N/A'}
                   </span>
                 </div>
               </div>
-              {/* Notes */}
               {booking.additional_notes && (
                 <div className="space-y-2 md:col-span-2">
                   <Label className="text-sm font-medium text-muted-foreground">
@@ -684,7 +819,7 @@ export default async function BookingDetailsPage({ params }: PageProps) {
             )}
           </CardContent>
         </Card>
-        <Separator />
+
         {/* Customer Information */}
         {customer && (
           <Card>
@@ -744,12 +879,12 @@ export default async function BookingDetailsPage({ params }: PageProps) {
         )}
 
         {/* Action Component */}
-        {booking.status === BookingStatus.WAITING_CONFIRMATION && (
-          <Action
-            booking={booking}
+        {(adjustment.status === AdjustmentStatus.PENDING ||
+          adjustment.status === AdjustmentStatus.WAITING_RECONFIRMATION) && (
+          <AdjustmentActions
+            adjustment={adjustment}
             availableEmployees={availableEmployees}
             needsEmployeeAssignment={needsEmployeeAssignment}
-            requiredRole={requiredRole}
           />
         )}
       </div>

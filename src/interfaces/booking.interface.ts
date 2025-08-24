@@ -22,6 +22,26 @@ import { Meta } from "./common.interface";
     booking_adjustments: BookingAdjustment[]
   }
 
+  export interface BookingWithoutAdjustments {
+    id: number
+    package_id?: number
+    car_id?: number
+    customer_id: number
+    employee_id: any
+    with_driver: boolean
+    number_of_persons?: number
+    start_date: string
+    end_date: string
+    total_price: number
+    status: string
+    pickup_location: string
+    pickup_time: string
+    additional_notes: string
+    created_at: string
+    updated_at: string
+    payments: Payment[]
+  }
+
   export interface GetAllBookingsResponse {
     data: Booking[]
     meta: Meta
