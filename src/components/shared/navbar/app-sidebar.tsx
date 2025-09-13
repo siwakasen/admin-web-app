@@ -9,6 +9,7 @@ import {
   BanknoteArrowDown,
   BanknoteArrowUp,
   XCircle,
+  FileChartColumnIcon,
 } from 'lucide-react';
 
 import { NavDataMasters } from '@/components/shared/navbar/nav-data-masters';
@@ -85,6 +86,38 @@ const ownerData = {
       name: 'Refunds',
       url: '/refunds',
       icon: BanknoteArrowDown,
+    },
+    {
+      name: 'Reports',
+      url: '/reports',
+      icon: FileChartColumnIcon,
+      items: [
+        {
+          title: 'Booking Monthly Revenue',
+          url: '/reports/booking-monthly-revenue',
+          icon: FileChartColumnIcon,
+        },
+        {
+          title: 'Booking Yearly Revenue',
+          url: '/reports/booking-yearly-revenue',
+          icon: FileChartColumnIcon,
+        },
+        {
+          title: 'Expenses Monthly',
+          url: '/reports/expenses-monthly',
+          icon: FileChartColumnIcon,
+        },
+        {
+          title: 'Expenses Yearly',
+          url: '/reports/expenses-yearly',
+          icon: FileChartColumnIcon,
+        },
+        {
+          title: 'Profit/Loss',
+          url: '/reports/profit-loss',
+          icon: FileChartColumnIcon,
+        },
+      ],
     },
   ],
   masters: [

@@ -1,15 +1,13 @@
 'use client';
 import { HeaderNavigation } from '@/components/shared/navbar/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useDeleteEmployee, useGetAllEmployees } from '@/hooks/employees.hook';
+import { useGetAllEmployees } from '@/hooks/employees.hook';
 import { EmployeesTable } from './_components/employees-table';
 import { Employee } from '@/interfaces';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusSquare, Search } from 'lucide-react';
 import { redirect } from 'next/navigation';
-import { ToastApi } from '@/lib/helper/toast-api';
-import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 
 export default function EmployeesPage() {
@@ -58,7 +56,6 @@ export default function EmployeesPage() {
         setEmployees(response.data);
         setMeta(response.meta);
       }
-      // ToastApi(response);
       setLoading(false);
     };
     fetchData();

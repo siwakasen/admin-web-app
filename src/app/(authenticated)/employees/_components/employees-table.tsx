@@ -126,9 +126,9 @@ export function EmployeesTable({
   };
 
   const formatSalary = (salary: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('id-ID', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'IDR',
     }).format(salary);
   };
 
@@ -231,7 +231,6 @@ export function EmployeesTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4 text-green-600" />
                         <span className="font-semibold text-green-600">
                           {formatSalary(employee.salary)}
                         </span>
@@ -444,9 +443,9 @@ export function EmployeesTable({
 
 function EmployeeDetails({ employee }: { employee: Employee }) {
   const formatSalary = (salary: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('id-ID', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'IDR',
     }).format(salary);
   };
 

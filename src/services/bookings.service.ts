@@ -1,7 +1,11 @@
-import { Pagination } from "@/interfaces/common.interface";
-import { createApiInstance } from "./api";
-import { BookingResponse, BookingStatus, GetAllBookingsResponse } from "@/interfaces/booking.interface";
-import { AxiosResponse } from "axios";
+import { Pagination } from '@/interfaces/common.interface';
+import { createApiInstance } from './api';
+import {
+  BookingResponse,
+  BookingStatus,
+  GetAllBookingsResponse,
+} from '@/interfaces/booking.interface';
+import { AxiosResponse } from 'axios';
 
 export async function getAllBookings(
   pagination: Pagination,
@@ -11,12 +15,12 @@ export async function getAllBookings(
     process.env.NEXT_PUBLIC_BOOKINGS_API_URL,
     token
   );
-  
+
   let url = `/bookings/all?limit=${pagination.limit}&page=${pagination.page}`;
   if (pagination.search && pagination.search.trim() !== '') {
     url += `&search=${encodeURIComponent(pagination.search)}`;
   }
-  
+
   const response: AxiosResponse = await api.get(url);
   return response.data;
 }
@@ -25,7 +29,7 @@ export async function assignBookingToEmployee(
   bookingId: number,
   employeeId: number,
   token: string
-    ): Promise<BookingResponse> {
+): Promise<BookingResponse> {
   const api = await createApiInstance(
     process.env.NEXT_PUBLIC_BOOKINGS_API_URL,
     token
@@ -35,7 +39,7 @@ export async function assignBookingToEmployee(
     `/bookings/assign-employee/${bookingId}`,
     {
       employee_id: employeeId,
-    },
+    }
   );
   return response.data;
 }
@@ -49,7 +53,7 @@ export async function confirmBookingWithoutDriver(
     token
   );
   const response: AxiosResponse = await api.patch(
-    `/bookings/confirm-without-driver/${bookingId}`,
+    `/bookings/confirm-without-driver/${bookingId}`
   );
   return response.data;
 }
@@ -68,7 +72,7 @@ export async function finishBooking(
     `/bookings/finish/${bookingId}`,
     {
       status: bookingStatus,
-    },
+    }
   );
   return response.data;
 }
@@ -85,5 +89,3 @@ export async function getBookingById(
   const response: AxiosResponse = await api.get(`/bookings/emp/${bookingId}`);
   return response.data;
 }
-
-

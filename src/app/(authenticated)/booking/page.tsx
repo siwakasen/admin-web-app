@@ -107,6 +107,7 @@ export default function BookingPage() {
         search: statusFilter === 'all' ? '' : statusFilter,
       });
       if ('data' in response && 'meta' in response) {
+        console.log(response.data);
         setBookings(response.data);
         setMeta(response.meta);
       }
