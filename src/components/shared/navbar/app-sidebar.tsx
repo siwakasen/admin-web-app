@@ -10,6 +10,7 @@ import {
   BanknoteArrowUp,
   XCircle,
   FileChartColumnIcon,
+  Star,
 } from 'lucide-react';
 
 import { NavDataMasters } from '@/components/shared/navbar/nav-data-masters';
@@ -118,6 +119,11 @@ const ownerData = {
           icon: FileChartColumnIcon,
         },
       ],
+    },
+    {
+      name: 'Ratings',
+      url: '/ratings',
+      icon: Star,
     },
   ],
   masters: [
