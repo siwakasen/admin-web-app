@@ -51,7 +51,6 @@ export default function Action({
       // TODO: Implement booking confirmation API call
 
       if (needsEmployeeAssignment) {
-        console.log('assigning employee');
         const response = await useAssignBookingToEmployee(
           booking.id,
           Number(selectedEmployeeId)
@@ -60,24 +59,20 @@ export default function Action({
           toast.error(response.errors.message || 'Failed to assign employee');
           return;
         } else if ('data' in response) {
-          console.log('employee assigned successfully');
           toast.success(response.message || 'Employee assigned successfully');
         }
         router.push('/booking');
       } else {
-        console.log('confirming booking without driver');
         const response = await useConfirmBookingWithoutDriver(booking.id);
         if ('errors' in response) {
           toast.error(response.errors.message || 'Failed to confirm booking');
           return;
         } else if ('data' in response) {
-          console.log('booking confirmed successfully');
           toast.success(response.message || 'Booking confirmed successfully');
         }
         router.push('/booking');
       }
     } catch (error) {
-      console.log('error', error);
       toast.error('Failed to confirm booking. Please try again.');
     } finally {
       setIsConfirming(false);

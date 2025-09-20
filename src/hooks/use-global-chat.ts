@@ -29,9 +29,6 @@ async function getSocketIO(): Promise<any> {
       const socketModule = await import('socket.io-client');
       io = socketModule.io as any;
     } catch (error) {
-      console.error(
-        'socket.io-client not installed. Please run: npm install socket.io-client'
-      );
       throw new Error('socket.io-client not installed');
     }
   }
@@ -81,19 +78,14 @@ export function useGlobalChat({
 
   useEffect(() => {
     const initializeSocket = async () => {
-      console.log('Initializing global chat socket');
       try {
         const authToken = await getToken();
         if (!authToken) {
-          console.log('No auth token available for global chat');
           return;
         }
 
         // Prevent duplicate initialization
         if (isInitializedRef.current || socket) {
-          console.log(
-            'Global chat socket already initialized or exists, skipping...'
-          );
           return;
         }
 
@@ -114,13 +106,11 @@ export function useGlobalChat({
 
         // Connection event handlers
         socketInstance.on('connect', () => {
-          console.log('Global chat socket connected');
           setIsConnected(true);
           setError(null);
         });
 
         socketInstance.on('disconnect', (reason: string) => {
-          console.log('Global chat socket disconnected:', reason);
           setIsConnected(false);
           if (reason === 'io server disconnect') {
             // Server disconnected, try to reconnect
@@ -129,22 +119,16 @@ export function useGlobalChat({
         });
 
         socketInstance.on('connect_error', (err: any) => {
-          console.error('Global chat WebSocket connection error:', err);
           setError(`Connection error: ${err.message || 'Failed to connect'}`);
           setIsConnected(false);
         });
 
         socketInstance.on('reconnect', (attemptNumber: number) => {
-          console.log(
-            'Reconnected to global chat WebSocket server, attempt:',
-            attemptNumber
-          );
           setIsConnected(true);
           setError(null);
         });
 
         socketInstance.on('reconnect_error', (err: any) => {
-          console.error('Global chat WebSocket reconnection error:', err);
           setError(`Reconnection failed: ${err.message || 'Unknown error'}`);
         });
 
@@ -152,14 +136,12 @@ export function useGlobalChat({
         socketInstance.on(
           'all_sessions',
           (sessions: WebSocketChatSession[]) => {
-            console.log('Received sessions from global chat:', sessions);
             setSessions(sessions);
           }
         );
 
         // Handle new message - this is the key part for global notifications
         socketInstance.on('new_message', (message: WebSocketChatMessage) => {
-          console.log('New message received in global chat:', message);
           // Fallback if session not found in current sessions
           toast.warning('New message received', {
             position: 'bottom-right',
@@ -182,8 +164,6 @@ export function useGlobalChat({
             status: 'OPEN' | 'CLOSED';
             createdAt: string;
           }) => {
-            console.log('New session received in global chat:', sessionData);
-
             // Add the new session to the sessions list
             const newSession: WebSocketChatSession = {
               id: sessionData.sessionId,
@@ -216,13 +196,11 @@ export function useGlobalChat({
 
         // Cleanup on unmount
         return () => {
-          console.log('Cleaning up global chat socket connection');
           isInitializedRef.current = false;
           socketInstance.removeAllListeners();
           socketInstance.disconnect();
         };
       } catch (error) {
-        console.error('Failed to initialize global chat WebSocket:', error);
         setError(
           'Failed to load global chat WebSocket client. Please install socket.io-client.'
         );
@@ -235,17 +213,14 @@ export function useGlobalChat({
   // Fetch sessions via WebSocket event
   const fetchSessions = useCallback(async () => {
     if (!socket || !isConnected) {
-      console.log('Cannot fetch sessions: WebSocket not connected');
       return;
     }
 
     setError(null);
 
     try {
-      console.log('Requesting all sessions via WebSocket...');
       socket.emit('get_all_sessions');
     } catch (error) {
-      console.error('Error requesting sessions:', error);
       setError(
         error instanceof Error ? error.message : 'Failed to request sessions'
       );

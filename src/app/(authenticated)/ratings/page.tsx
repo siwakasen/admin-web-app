@@ -53,7 +53,6 @@ export default function RatingsPage() {
         page: currentPage,
         search: '',
       });
-      console.log(response);
       if ('data' in response) {
         setRatings(response.data);
         // Since the rating API doesn't return meta, we'll create a simple pagination

@@ -25,9 +25,6 @@ async function getSocketIO(): Promise<any> {
       const socketModule = await import('socket.io-client');
       io = socketModule.io as any;
     } catch (error) {
-      console.error(
-        'socket.io-client not installed. Please run: npm install socket.io-client'
-      );
       throw new Error('socket.io-client not installed');
     }
   }
@@ -94,7 +91,6 @@ export function useWebSocketChat({
 
   useEffect(() => {
     const initializeSocket = async () => {
-      console.log('Initializing socket');
       try {
         if (!authToken) {
           setError('No authentication token provided');
@@ -103,7 +99,6 @@ export function useWebSocketChat({
 
         // Prevent duplicate initialization
         if (isInitializedRef.current || socket) {
-          console.log('Socket already initialized or exists, skipping...');
           return;
         }
 
@@ -137,26 +132,16 @@ export function useWebSocketChat({
         });
 
         socketInstance.on('connect_error', (err: any) => {
-          console.error('WebSocket connection error:', err);
-          console.error(
-            'Auth token being used:',
-            authToken ? 'Token present' : 'No token'
-          );
           setError(`Connection error: ${err.message || 'Failed to connect'}`);
           setIsConnected(false);
         });
 
         socketInstance.on('reconnect', (attemptNumber: number) => {
-          console.log(
-            'Reconnected to WebSocket server, attempt:',
-            attemptNumber
-          );
           setIsConnected(true);
           setError(null);
         });
 
         socketInstance.on('reconnect_error', (err: any) => {
-          console.error('WebSocket reconnection error:', err);
           setError(`Reconnection failed: ${err.message || 'Unknown error'}`);
         });
 
@@ -164,7 +149,6 @@ export function useWebSocketChat({
         socketInstance.on(
           'all_sessions',
           (sessions: WebSocketChatSession[]) => {
-            console.log('Received sessions from all_sessions:', sessions);
             sessionsRef.current = sessions;
             sessionRef.current = sessions.find(
               (session) => session.id === currentSessionRef.current
@@ -177,11 +161,9 @@ export function useWebSocketChat({
         socketInstance.on(
           'messages',
           (sessionMessages: WebSocketChatMessage[]) => {
-            console.log('Received messages for session:', sessionMessages);
             if (sessionMessages && sessionMessages.length > 0) {
               const sessionId = sessionMessages[0].chat_session_id;
               if (currentSessionRef.current === sessionId) {
-                console.log('Setting messages for current session:', sessionId);
                 setMessages(sessionMessages);
               }
             }
@@ -208,7 +190,6 @@ export function useWebSocketChat({
         });
 
         socketInstance.on('session_error', (errorData: { message: string }) => {
-          console.error('Session error:', errorData.message);
           setError(errorData.message);
         });
 
@@ -222,8 +203,6 @@ export function useWebSocketChat({
             status: 'OPEN' | 'CLOSED';
             createdAt: string;
           }) => {
-            console.log('New session received from admin room:', sessionData);
-
             // Add the new session to the sessions list
             const newSession: WebSocketChatSession = {
               id: sessionData.sessionId,
@@ -243,12 +222,10 @@ export function useWebSocketChat({
               );
               let updatedSessions;
               if (exists) {
-                console.log('Session already exists, updating instead');
                 updatedSessions = prev.map((session) =>
                   session.id === sessionData.sessionId ? newSession : session
                 );
               } else {
-                console.log('Adding new session to list');
                 updatedSessions = [newSession, ...prev];
               }
               // Update the sessions ref
@@ -262,8 +239,6 @@ export function useWebSocketChat({
         socketInstance.on(
           'session_ended',
           (data: { sessionId: number; message: string }) => {
-            console.log('Session ended from session_ended:', data);
-
             // Update the session status in the sessions list
             setSessions((prev) => {
               const updatedSessions = prev.map((session) =>
@@ -299,13 +274,11 @@ export function useWebSocketChat({
 
         // Cleanup on unmount
         return () => {
-          console.log('Cleaning up socket connection');
           isInitializedRef.current = false;
           socketInstance.removeAllListeners();
           socketInstance.disconnect();
         };
       } catch (error) {
-        console.error('Failed to initialize WebSocket:', error);
         setError(
           'Failed to load WebSocket client. Please install socket.io-client.'
         );
@@ -318,7 +291,6 @@ export function useWebSocketChat({
   // Fetch sessions via WebSocket event
   const fetchSessions = useCallback(async () => {
     if (!socket || !isConnected) {
-      console.log('Cannot fetch sessions: WebSocket not connected');
       return;
     }
 
@@ -326,10 +298,8 @@ export function useWebSocketChat({
     setError(null);
 
     try {
-      console.log('Requesting all sessions via WebSocket...');
       socket.emit('get_all_sessions');
     } catch (error) {
-      console.error('Error requesting sessions:', error);
       setError(
         error instanceof Error ? error.message : 'Failed to request sessions'
       );
@@ -354,10 +324,8 @@ export function useWebSocketChat({
       setError(null);
       currentSessionRef.current = chatSessionId;
 
-      // Add acknowledgment callback to see if the event was received
-      socket.emit('get_messages', { chatSessionId }, (response: any) => {
-        console.log('get_messages:', response);
-      });
+      // getting messages for the session
+      socket.emit('get_messages', { chatSessionId }, (response: any) => {});
 
       joinedSessionsRef.current.add(chatSessionId);
 
@@ -384,7 +352,6 @@ export function useWebSocketChat({
         return;
       }
 
-      console.log('Sending message:', { chatSessionId, message });
       socket.emit('reply_message', { chatSessionId, message });
       setError(null);
     },

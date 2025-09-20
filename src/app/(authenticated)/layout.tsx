@@ -11,7 +11,6 @@ export default async function AuthenticatedLayout({
   children: React.ReactNode;
 }>) {
   const { employee } = await useGetEmployee();
-  console.log(employee);
 
   if (!employee) {
     redirect('/redirect/reset-cookie');
@@ -21,7 +20,7 @@ export default async function AuthenticatedLayout({
       <AppSidebar employee={employee} />
       <SidebarInset>
         {children}
-        <GlobalChatProvider employeeId={employee.id} />
+        <GlobalChatProvider employeeRole={employee.role.id} />
       </SidebarInset>
     </SidebarProvider>
   );

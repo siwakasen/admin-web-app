@@ -8,18 +8,16 @@ import { usePathname } from 'next/navigation';
  * This is a client component wrapper that can be used in server components
  */
 export default function GlobalChatProvider({
-  employeeId,
+  employeeRole,
 }: {
-  employeeId: number;
+  employeeRole: number;
 }) {
   const pathname = usePathname();
-  console.log(pathname);
 
   if (pathname.startsWith('/live-chat')) {
     return null;
   }
-
-  if (employeeId !== 2) {
+  if (employeeRole !== 2) {
     return null;
   }
   return <LiveChatWrapper />;
