@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
     'localhost:3005',
     'localhost:3006',
     'localhost:3007',
+    'localhost:3008',
   ],
   experimental: {
     useCache: true,

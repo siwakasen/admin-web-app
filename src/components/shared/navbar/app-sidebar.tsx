@@ -8,9 +8,9 @@ import {
   CalendarCheck,
   BanknoteArrowDown,
   BanknoteArrowUp,
-  XCircle,
   FileChartColumnIcon,
   Star,
+  MessageCircle,
 } from 'lucide-react';
 
 import { NavDataMasters } from '@/components/shared/navbar/nav-data-masters';
@@ -66,6 +66,11 @@ const adminData = {
       name: 'Rescheduling & Cancellation',
       url: '/booking-adjustments',
       icon: CalendarSyncIcon,
+    },
+    {
+      name: 'Live Chat',
+      url: '/live-chat',
+      icon: MessageCircle,
     },
   ],
 };
