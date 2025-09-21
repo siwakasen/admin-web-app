@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'CMS Ride Bali Explore',
-  description: 'CMS Ride Bali Explore',
+  title: 'CMS Bali Travel Ride',
+  description: 'CMS Bali Travel Ride',
 };
 
 export default function RootLayout({

@@ -29,7 +29,7 @@ import { Employee } from '@/interfaces';
 const adminData = {
   teams: [
     {
-      name: 'Ride Bali Explore',
+      name: 'Bali Travel Ride',
       plan: '',
     },
   ],
@@ -78,7 +78,7 @@ const adminData = {
 const ownerData = {
   teams: [
     {
-      name: 'Ride Bali Explore',
+      name: 'Bali Travel Ride',
       plan: '',
     },
   ],
