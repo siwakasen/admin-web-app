@@ -46,11 +46,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // check if the user is an admin and is trying to access pages for owner
+  console.log(decodedToken?.type);
   if (
-    (decodedToken?.type === 'e' &&
-      (request.nextUrl.pathname.startsWith('/employees') ||
-        request.nextUrl.pathname.startsWith('/refunds'))) ||
-    request.nextUrl.pathname.startsWith('/reports')
+    decodedToken?.type === 'e' &&
+    (request.nextUrl.pathname.startsWith('/employees') ||
+      request.nextUrl.pathname.startsWith('/refunds') ||
+      request.nextUrl.pathname.startsWith('/reports') ||
+      request.nextUrl.pathname.startsWith('/ratings'))
   ) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
@@ -76,5 +78,6 @@ export const config = {
     '/refunds/:path*',
     '/employees/:path*',
     '/reports/:path*',
+    '/ratings/:path*',
   ],
 };
