@@ -161,7 +161,7 @@ export function BookingTable({
     } finally {
       setFinishDialogOpen(false);
       setBookingToFinish(null);
-      setFinishStatus(BookingStatus.COMPLETED);
+      setFinishStatus(finishStatus);
     }
   };
 
@@ -371,10 +371,18 @@ export function BookingTable({
                             <FileText className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-                          {booking.status === BookingStatus.ONGOING && (
+                          {(booking.status === BookingStatus.ONGOING ||
+                            booking.status === BookingStatus.CONFIRMED) && (
                             <DropdownMenuItem
                               className="text-green-600 focus:text-green-600"
-                              onClick={() => handleFinishClick(booking)}
+                              onClick={() => {
+                                setFinishStatus(
+                                  booking.status === BookingStatus.ONGOING
+                                    ? BookingStatus.COMPLETED
+                                    : BookingStatus.NO_SHOW
+                                );
+                                handleFinishClick(booking);
+                              }}
                             >
                               <CheckCircle className="h-4 w-4 mr-2" />
                               Finish Booking
