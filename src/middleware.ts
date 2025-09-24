@@ -46,7 +46,6 @@ export async function middleware(request: NextRequest) {
   }
 
   // check if the user is an admin and is trying to access pages for owner
-  console.log(decodedToken?.type);
   if (
     decodedToken?.type === 'e' &&
     (request.nextUrl.pathname.startsWith('/employees') ||
