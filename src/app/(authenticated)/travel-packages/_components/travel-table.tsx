@@ -304,10 +304,12 @@ export function TravelPackagesTable({
                                       key={index}
                                       className="text-sm flex items-start gap-2"
                                     >
-                                      <span className="text-muted-foreground">
+                                      <span className="text-muted-foreground flex-shrink-0">
                                         •
                                       </span>
-                                      {item}
+                                      <span className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">
+                                        {item}
+                                      </span>
                                     </li>
                                   ))}
                                 </ul>
