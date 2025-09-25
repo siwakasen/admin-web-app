@@ -93,13 +93,12 @@ export default function BookingMonthlyRevenuePage() {
     try {
       // Calculate start and end dates from selected month
       const [year, month] = selectedMonth.split('-');
-      const startDate = new Date(parseInt(year), parseInt(month) - 1, 1)
+      const startDate = new Date(parseInt(year), parseInt(month) - 1, 2)
         .toISOString()
         .split('T')[0];
-      const endDate = new Date(parseInt(year), parseInt(month), 0)
+      const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59)
         .toISOString()
         .split('T')[0];
-
       const data = await useGetBookingMonthlyRevenue({
         start_date: startDate,
         end_date: endDate,
