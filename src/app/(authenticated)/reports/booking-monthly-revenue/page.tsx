@@ -61,13 +61,6 @@ export default function BookingMonthlyRevenuePage() {
   const [error, setError] = useState<string>('');
   const [token, setToken] = useState<string>('');
 
-  // Monthly data doesn't have monthly_breakdown, so we'll remove chart data for now
-  // const chartData = reportData?.monthly_breakdown?.map((month) => ({
-  //   month: month.month_name,
-  //   gross_revenue: month.gross_revenue,
-  //   net_revenue: month.net_revenue,
-  // })) || [];
-
   // Get token on component mount
   useEffect(() => {
     const fetchToken = async () => {

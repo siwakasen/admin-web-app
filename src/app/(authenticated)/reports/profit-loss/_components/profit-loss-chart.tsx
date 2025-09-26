@@ -1,7 +1,7 @@
 'use client';
 
-import { TrendingUp, TrendingDown } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { TrendingUp } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
 import {
   Card,
@@ -14,13 +14,11 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
 
-export const description = 'An area chart showing profit/loss trends';
+export const description = 'A bar chart';
 
 interface ChartData {
   month: string;
@@ -34,7 +32,7 @@ interface ProfitLossChartProps {
 const chartConfig = {
   profit_loss: {
     label: 'Profit/Loss',
-    color: '#3b82f6', // Blue
+    color: 'var(--chart-1)',
   },
 } satisfies ChartConfig;
 
@@ -42,45 +40,42 @@ export function ProfitLossChart({ chartData }: ProfitLossChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profit/Loss Trend Chart</CardTitle>
+        <CardTitle>Profit/Loss Chart</CardTitle>
         <CardDescription>
-          Showing monthly profit/loss trends for the selected year
+          Showing monthly profit/loss for the selected year
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
+          <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
               tickLine={false}
+              tickMargin={10}
               axisLine={false}
-              tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={<ChartTooltipContent hideLabel />}
             />
-            <Area
+            <Bar
               dataKey="profit_loss"
-              type="natural"
               fill="var(--color-profit_loss)"
-              fillOpacity={0.6}
-              stroke="var(--color-profit_loss)"
-              stackId="a"
+              radius={8}
             />
-            <ChartLegend content={<ChartLegendContent />} />
-          </AreaChart>
+          </BarChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 leading-none font-medium">
+          Profit/Loss overview <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="text-muted-foreground leading-none">
+          Showing monthly profit/loss for the selected year
+        </div>
+      </CardFooter>
     </Card>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { TrendingUp } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
 import {
   Card,
@@ -14,13 +14,11 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
 
-export const description = 'An area chart with a legend';
+export const description = 'A multiple bar chart';
 
 const chartConfig = {
   gross_revenue: {
@@ -41,53 +39,47 @@ export function YearlyChart({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Yearly Chart</CardTitle>
+        <CardTitle>Yearly Revenue Chart</CardTitle>
         <CardDescription>
           Showing yearly revenue for the last 5 years
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
+          <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
               tickLine={false}
+              tickMargin={10}
               axisLine={false}
-              tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Area
-              dataKey="net_revenue"
-              type="natural"
-              fill="var(--color-net_revenue)"
-              fillOpacity={0.4}
-              stroke="var(--color-net_revenue)"
-              stackId="a"
-            />
-            <Area
+            <Bar
               dataKey="gross_revenue"
-              type="natural"
               fill="var(--color-gross_revenue)"
-              fillOpacity={0.4}
-              stroke="var(--color-gross_revenue)"
-              stackId="a"
+              radius={4}
             />
-            <ChartLegend content={<ChartLegendContent />} />
-          </AreaChart>
+            <Bar
+              dataKey="net_revenue"
+              fill="var(--color-net_revenue)"
+              radius={4}
+            />
+          </BarChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 leading-none font-medium">
+          Revenue overview <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="text-muted-foreground leading-none">
+          Showing total revenue for the last 5 years
+        </div>
+      </CardFooter>
     </Card>
   );
 }
