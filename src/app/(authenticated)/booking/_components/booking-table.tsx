@@ -179,17 +179,30 @@ export function BookingTable({
   };
 
   const formatTime = (timeString: string) => {
-    // 13:04:00
-    // Remove the seconds from the time string (e.g., "13:04:00" -> "13:04")
     return timeString.slice(0, 5);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+    const isoMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!isoMatch) return '';
+    const [_, year, month, day] = isoMatch;
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const monthName = months[parseInt(month, 10) - 1];
+    return `${monthName} ${day.padStart(2, '0')}, ${year}`;
   };
 
   const getStatusBadgeClass = (status: string) => {

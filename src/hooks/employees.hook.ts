@@ -1,36 +1,59 @@
-"use server";
-import { ChangePasswordRequest, CreateEmployeeRequest, CreateEmployeeResponse, DeleteEmployeeResponse, Employee, EmployeeResponse, GetAllEmployeesResponse, Pagination, UpdateEmployeeRequest, UpdateEmployeeResponse } from "@/interfaces";
-import { createSession, deleteSession, getToken } from "@/lib/user-provider";
+'use server';
+import {
+  ChangePasswordRequest,
+  CreateEmployeeRequest,
+  CreateEmployeeResponse,
+  DeleteEmployeeResponse,
+  Employee,
+  EmployeeResponse,
+  GetAllEmployeesResponse,
+  Pagination,
+  UpdateEmployeeRequest,
+  UpdateEmployeeResponse,
+} from '@/interfaces';
+import { createSession, deleteSession, getToken } from '@/lib/user-provider';
 import {
   ForgetPasswordFormSchemaType,
   LoginFormSchemaType,
-} from "@/lib/validations";
-import { changePassword, createEmployee, deleteEmployee, forgetPassword, getAllEmployees, getAvailableEmployees, getAvailableEmployeesByDateRange, getEmployee, getEmployeeById, login, updateEmployee } from "@/services";
-import { redirect, RedirectType } from "next/navigation";
-import { revalidateTag, unstable_cache } from "next/cache";
-import { AxiosError } from "axios";
+} from '@/lib/validations';
+import {
+  changePassword,
+  createEmployee,
+  deleteEmployee,
+  forgetPassword,
+  getAllEmployees,
+  getAvailableEmployees,
+  getAvailableEmployeesByDateRange,
+  getEmployee,
+  getEmployeeById,
+  login,
+  updateEmployee,
+} from '@/services';
+import { redirect, RedirectType } from 'next/navigation';
+import { revalidateTag, unstable_cache } from 'next/cache';
+import { AxiosError } from 'axios';
 
 export async function useLoginUser(formData: LoginFormSchemaType) {
   try {
     const response = await login(formData);
     await createSession(response.data.token);
-    
+
     revalidateTag('session');
-    
+
     return {
-      message: response.data.message || "Login successful!",
+      message: response.data.message || 'Login successful!',
     };
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
     }
-    if (error.code == "ECONNREFUSED") {
+    if (error.code == 'ECONNREFUSED') {
       return {
         status: 500,
         errors: {
-          message: "Server are not available",
+          message: 'Server are not available',
         },
       };
     }
@@ -43,29 +66,28 @@ export async function useLoginUser(formData: LoginFormSchemaType) {
 const getCachedEmployee = unstable_cache(
   async (token: string) => {
     try {
-      
       const { data } = await getEmployee(token);
 
-      if(!data){
-        redirect("/redirect/reset-cookie", RedirectType.replace);
+      if (!data) {
+        redirect('/redirect/reset-cookie', RedirectType.replace);
       }
 
       return { employee: data };
     } catch (error: any) {
-      if(error instanceof AxiosError) {
+      if (error instanceof AxiosError) {
         console.error('Axios response message:', error.response?.data.message);
       } else {
         console.error('Error message:', error.message);
       }
       const message: string = error.message;
       if (
-        message.includes("Invalid token") ||
-        error.code == "ERR_BAD_REQUEST" ||
-        error.code == "ECONNREFUSED" ||
-        error.code == "ERR_NETWORK" ||
-        error.response?.data.message.includes("Invalid token")
+        message.includes('Invalid token') ||
+        error.code == 'ERR_BAD_REQUEST' ||
+        error.code == 'ECONNREFUSED' ||
+        error.code == 'ERR_NETWORK' ||
+        error.response?.data.message.includes('Invalid token')
       ) {
-        redirect("/redirect/reset-cookie", RedirectType.replace);
+        redirect('/redirect/reset-cookie', RedirectType.replace);
       }
       return { employee: undefined };
     }
@@ -73,27 +95,27 @@ const getCachedEmployee = unstable_cache(
   ['employee-session'],
   {
     tags: ['session'],
-    revalidate: 3600, 
+    revalidate: 3600,
   }
 );
 
 export async function useGetEmployee() {
-  const token = (await getToken()) || "";
+  const token = (await getToken()) || '';
   if (!token) {
     return { employee: undefined };
   }
   return getCachedEmployee(token);
 }
 
-
-export async function useGetAvailableEmployees(): Promise<EmployeeResponse[] | { status?: number; errors?: any }> {
+export async function useGetAvailableEmployees(): Promise<
+  EmployeeResponse[] | { status?: number; errors?: any }
+> {
   try {
-
-    const token = (await getToken()) || "";
+    const token = (await getToken()) || '';
     const response = await getAvailableEmployees(token);
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -112,11 +134,17 @@ export async function useGetAvailableEmployeesByDateRange(
   bookingId: number
 ): Promise<GetAllEmployeesResponse | { status?: number; errors?: any }> {
   try {
-    const token = (await getToken()) || "";
-    const response = await getAvailableEmployeesByDateRange(token, startDate, endDate, roleId, bookingId);
+    const token = (await getToken()) || '';
+    const response = await getAvailableEmployeesByDateRange(
+      token,
+      startDate,
+      endDate,
+      roleId,
+      bookingId
+    );
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -130,17 +158,20 @@ export async function useGetAvailableEmployeesByDateRange(
 
 export async function useLogoutUser() {
   try {
-  await deleteSession();
-  
-  revalidateTag('session');
-  
+    await deleteSession();
+
+    revalidateTag('session');
+
     return {
-      message: "Logout successful!",
+      message: 'Logout successful!',
     };
   } catch (error: any) {
-    console.error('Error message:', `Error on delete session | ${error.message}`);
+    console.error(
+      'Error message:',
+      `Error on delete session | ${error.message}`
+    );
     return {
-      message: "Logout failed!",
+      message: 'Logout failed!',
     };
   }
 }
@@ -149,12 +180,11 @@ export async function useForgetPasswordUser(
 ) {
   try {
     const { message } = await forgetPassword(formData);
-
     return {
-      message: message || "Email to reset password sent!",
+      message: message || 'Email to reset password sent!',
     };
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -173,7 +203,7 @@ export async function useChangePasswordUser(
     const { message } = await changePassword(formData);
     return { message };
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -185,13 +215,15 @@ export async function useChangePasswordUser(
   }
 }
 
-export async function useGetAllEmployees(pagination?: Pagination): Promise<GetAllEmployeesResponse | { status?: number; errors?: any }> {
+export async function useGetAllEmployees(
+  pagination?: Pagination
+): Promise<GetAllEmployeesResponse | { status?: number; errors?: any }> {
   try {
-    const token = (await getToken()) || "";
+    const token = (await getToken()) || '';
     const response = await getAllEmployees(token, pagination);
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -203,13 +235,17 @@ export async function useGetAllEmployees(pagination?: Pagination): Promise<GetAl
   }
 }
 
-export async function useGetEmployeeById(id: number): Promise<EmployeeResponse | { status?: number; errors?: any }> {
+export async function useGetEmployeeById(
+  id: number
+): Promise<EmployeeResponse | { status?: number; errors?: any }> {
   try {
-    const token = (await getToken()) || "";
+    const token = (await getToken()) || '';
+    console.log('useGetEmployeeById | payload', { id });
     const response = await getEmployeeById(token, id);
+    console.log('useGetEmployeeById | response', response);
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -221,13 +257,15 @@ export async function useGetEmployeeById(id: number): Promise<EmployeeResponse |
   }
 }
 
-export async function useCreateEmployee(payload: CreateEmployeeRequest): Promise<CreateEmployeeResponse | { status?: number; errors?: any }> {
+export async function useCreateEmployee(
+  payload: CreateEmployeeRequest
+): Promise<CreateEmployeeResponse | { status?: number; errors?: any }> {
   try {
-    const token = (await getToken()) || "";
+    const token = (await getToken()) || '';
     const response = await createEmployee(token, payload);
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -239,13 +277,16 @@ export async function useCreateEmployee(payload: CreateEmployeeRequest): Promise
   }
 }
 
-export async function useUpdateEmployee(id: number, payload: UpdateEmployeeRequest): Promise<UpdateEmployeeResponse | { status?: number; errors?: any }> {
+export async function useUpdateEmployee(
+  id: number,
+  payload: UpdateEmployeeRequest
+): Promise<UpdateEmployeeResponse | { status?: number; errors?: any }> {
   try {
-    const token = (await getToken()) || "";
+    const token = (await getToken()) || '';
     const response = await updateEmployee(token, id, payload);
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -257,13 +298,17 @@ export async function useUpdateEmployee(id: number, payload: UpdateEmployeeReque
   }
 }
 
-export async function useDeleteEmployee(id: number): Promise<DeleteEmployeeResponse | { status?: number; errors?: any }> {
+export async function useDeleteEmployee(
+  id: number
+): Promise<DeleteEmployeeResponse | { status?: number; errors?: any }> {
   try {
-    const token = (await getToken()) || "";
+    const token = (await getToken()) || '';
+    console.log('useDeleteEmployee | payload', { id });
     const response = await deleteEmployee(token, id);
+    console.log('useDeleteEmployee | response', response);
     return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);

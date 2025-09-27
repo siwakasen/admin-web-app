@@ -1,24 +1,48 @@
-"use server";
+'use server';
 
-import { CarsDetailResponse, CarsResponse, CreateUpdateCarRequest, Pagination } from "@/interfaces";
-import { getCarDetail, getAllCars, deleteCar, createCar, updateCar, uploadCarImage, getAllCarsHistory, getCarsDetailHistoryById } from "@/services";
-import { getToken } from "@/lib/user-provider";
-import { redirect, RedirectType } from "next/navigation";
-import { AxiosError } from "axios";
+import {
+  CarsDetailResponse,
+  CarsResponse,
+  CreateUpdateCarRequest,
+  Pagination,
+} from '@/interfaces';
+import {
+  getCarDetail,
+  getAllCars,
+  deleteCar,
+  createCar,
+  updateCar,
+  uploadCarImage,
+  getAllCarsHistory,
+  getCarsDetailHistoryById,
+} from '@/services';
+import { getToken } from '@/lib/user-provider';
+import { redirect, RedirectType } from 'next/navigation';
+import { AxiosError } from 'axios';
 
-export async function useGetAllCars(pagination: Pagination): Promise<CarsResponse> {
-  return await getAllCars(pagination);
+export async function useGetAllCars(
+  pagination: Pagination
+): Promise<CarsResponse> {
+  console.log('useGetAllCars | payload', { pagination });
+  const response = await getAllCars(pagination);
+  console.log('useGetAllCars | response', response);
+  return response;
 }
 
-export async function useGetAllCarsHistory(pagination: Pagination): Promise<CarsResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
+export async function useGetAllCarsHistory(
+  pagination: Pagination
+): Promise<CarsResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await getAllCarsHistory(pagination, token);
+    console.log('useGetAllCarsHistory | payload', { pagination });
+    const response = await getAllCarsHistory(pagination, token);
+    console.log('useGetAllCarsHistory | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -30,16 +54,20 @@ export async function useGetAllCarsHistory(pagination: Pagination): Promise<Cars
   }
 }
 
-export async function useGetCarDetail(id: number): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
+export async function useGetCarDetail(
+  id: number
+): Promise<CarsDetailResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await getCarDetail(id);
+    console.log('useGetCarDetail | payload', { id });
+    const response = await getCarDetail(id);
+    console.log('useGetCarDetail | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -49,18 +77,22 @@ export async function useGetCarDetail(id: number): Promise<CarsDetailResponse | 
       errors: error.response?.data,
     };
   }
-}   
+}
 
-export async function useGetCarsDetailHistoryById(id: number): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
+export async function useGetCarsDetailHistoryById(
+  id: number
+): Promise<CarsDetailResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await getCarsDetailHistoryById(id);
+    console.log('useGetCarsDetailHistoryById | payload', { id });
+    const response = await getCarsDetailHistoryById(id);
+    console.log('useGetCarsDetailHistoryById | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -72,16 +104,20 @@ export async function useGetCarsDetailHistoryById(id: number): Promise<CarsDetai
   }
 }
 
-export async function useDeleteCar(id: number): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
+export async function useDeleteCar(
+  id: number
+): Promise<CarsDetailResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await deleteCar(id, token);
+    console.log('useDeleteCar | payload', { id });
+    const response = await deleteCar(id, token);
+    console.log('useDeleteCar | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -93,37 +129,20 @@ export async function useDeleteCar(id: number): Promise<CarsDetailResponse | {st
   }
 }
 
-export async function useCreateCar(payload: CreateUpdateCarRequest): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
+export async function useCreateCar(
+  payload: CreateUpdateCarRequest
+): Promise<CarsDetailResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
-    }
-    try {
-      return await createCar(payload, token);
-    } catch (error: any) {
-      if(error instanceof AxiosError) {
-        console.error('Axios response message:', error.response?.data.message);
-      } else {
-        console.error('Error message:', error.message);
-      }
-      return {
-        status: error.response.status,
-        errors: error.response.data,
-      };
-    }
-}
-
-export async function useUploadCarImage(id: number, image: File): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
-  if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
-    }
-  try{
-    return await uploadCarImage(id, image, token);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
+  }
+  try {
+    console.log('useCreateCar | payload', { payload });
+    const response = await createCar(payload, token);
+    console.log('useCreateCar | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -135,16 +154,21 @@ export async function useUploadCarImage(id: number, image: File): Promise<CarsDe
   }
 }
 
-export async function useUpdateCar(id: number, payload: CreateUpdateCarRequest): Promise<CarsDetailResponse | {status?: number, errors?: any}> {
-  const token = (await getToken()) || "";
+export async function useUploadCarImage(
+  id: number,
+  image: File
+): Promise<CarsDetailResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
-  try{
-    return await updateCar(id, payload, token);
+  try {
+    console.log('useUploadCarImage | payload', { id, image });
+    const response = await uploadCarImage(id, image, token);
+    console.log('useUploadCarImage | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -156,3 +180,28 @@ export async function useUpdateCar(id: number, payload: CreateUpdateCarRequest):
   }
 }
 
+export async function useUpdateCar(
+  id: number,
+  payload: CreateUpdateCarRequest
+): Promise<CarsDetailResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
+  if (!token) {
+    redirect('/redirect/reset-cookie', RedirectType.replace);
+  }
+  try {
+    console.log('useUpdateCar | payload', { id, payload });
+    const response = await updateCar(id, payload, token);
+    console.log('useUpdateCar | response', response);
+    return response;
+  } catch (error: any) {
+    if (error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response.status,
+      errors: error.response.data,
+    };
+  }
+}

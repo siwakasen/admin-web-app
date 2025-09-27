@@ -33,9 +33,12 @@ import { AxiosError } from 'axios';
 export async function useGetBookingMonthlyRevenue(
   payload: BookingMonthlyReportRequest
 ): Promise<BookingMonthlyReportResponse | { status?: number; errors?: any }> {
+  console.log('useGetBookingMonthlyRevenue | payload', payload);
   try {
     const token = (await getToken()) || '';
-    return await getBookingMonthlyRevenue(payload, token);
+    const response = await getBookingMonthlyRevenue(payload, token);
+    console.log('useGetBookingMonthlyRevenue | response', response);
+    return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
@@ -52,10 +55,11 @@ export async function useGetBookingMonthlyRevenue(
 export async function useGetBookingYearlyReport(
   payload: BookingYearlyReportRequest
 ): Promise<BookingYearlyReportResponse | { status?: number; errors?: any }> {
+  console.log('useGetBookingYearlyReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getBookingYearlyReport(payload, token);
-
+    console.log('useGetBookingYearlyReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
@@ -75,9 +79,11 @@ export async function useGetYearBookingComparisonReport(
 ): Promise<
   YearBookingComparisonReportResponse | { status?: number; errors?: any }
 > {
+  console.log('useGetYearBookingComparisonReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getYearBookingComparisonReport(payload, token);
+    console.log('useGetYearBookingComparisonReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
@@ -95,9 +101,11 @@ export async function useGetYearBookingComparisonReport(
 export async function useGetExpensesMonthlyReport(
   payload: ExpensesMonthlyReportRequest
 ): Promise<ExpensesMonthlyReportResponse | { status?: number; errors?: any }> {
+  console.log('useGetExpensesMonthlyReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getExpensesMonthlyReport(payload, token);
+    console.log('useGetExpensesMonthlyReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
@@ -115,9 +123,11 @@ export async function useGetExpensesMonthlyReport(
 export async function useGetExpensesYearlyReport(
   payload: ExpensesYearlyReportRequest
 ): Promise<ExpensesYearlyReportResponse | { status?: number; errors?: any }> {
+  console.log('useGetExpensesYearlyReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getExpensesYearlyReport(payload, token);
+    console.log('useGetExpensesYearlyReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
@@ -137,9 +147,11 @@ export async function useGetYearExpensesComparisonReport(
 ): Promise<
   YearExpensesComparisonReportResponse | { status?: number; errors?: any }
 > {
+  console.log('useGetYearExpensesComparisonReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getYearExpensesComparisonReport(payload, token);
+    console.log('useGetYearExpensesComparisonReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
@@ -157,9 +169,11 @@ export async function useGetYearExpensesComparisonReport(
 export async function useGetProfitLossReport(
   payload: ProfitLossReportRequest
 ): Promise<ProfitLossReportResponse | { status?: number; errors?: any }> {
+  console.log('useGetProfitLossReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getProfitLossReport(payload, token);
+    console.log('useGetProfitLossReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
@@ -179,9 +193,11 @@ export async function useGetYearsProfitLossComparisonReport(
 ): Promise<
   YearsProfitLossComparisonReportResponse | { status?: number; errors?: any }
 > {
+  console.log('useGetYearsProfitLossComparisonReport | payload', payload);
   try {
     const token = (await getToken()) || '';
     const response = await getYearsProfitLossComparisonReport(payload, token);
+    console.log('useGetYearsProfitLossComparisonReport | response', response);
     return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {

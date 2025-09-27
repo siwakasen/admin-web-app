@@ -1,22 +1,36 @@
-"use server";
+'use server';
 
-import { getAllBookings, assignBookingToEmployee, finishBooking, confirmBookingWithoutDriver, getBookingById } from "@/services/bookings.service";
-import { getToken } from "@/lib/user-provider";
-import { redirect, RedirectType } from "next/navigation";
-import { Pagination } from "@/interfaces/common.interface";
-import { BookingResponse, BookingStatus, GetAllBookingsResponse } from "@/interfaces/booking.interface";
-import { AxiosError } from "axios";
+import {
+  getAllBookings,
+  assignBookingToEmployee,
+  finishBooking,
+  confirmBookingWithoutDriver,
+  getBookingById,
+} from '@/services/bookings.service';
+import { getToken } from '@/lib/user-provider';
+import { redirect, RedirectType } from 'next/navigation';
+import { Pagination } from '@/interfaces/common.interface';
+import {
+  BookingResponse,
+  BookingStatus,
+  GetAllBookingsResponse,
+} from '@/interfaces/booking.interface';
+import { AxiosError } from 'axios';
 
-export async function useGetAllBookings(pagination: Pagination): Promise<GetAllBookingsResponse| {status?: number, errors?:any}> {
-  const token = (await getToken()) || "";
+export async function useGetAllBookings(
+  pagination: Pagination
+): Promise<GetAllBookingsResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await getAllBookings(pagination, token);
+    console.log('useGetAllBookings | pagination', pagination);
+    const response = await getAllBookings(pagination, token);
+    console.log('useGetAllBookings | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -28,100 +42,28 @@ export async function useGetAllBookings(pagination: Pagination): Promise<GetAllB
   }
 }
 
-export async function useAssignBookingToEmployee(bookingId: number, employeeId: number): Promise<BookingResponse| {status?: number, errors?:any}> {
-  const token = (await getToken()) || "";
+export async function useAssignBookingToEmployee(
+  bookingId: number,
+  employeeId: number
+): Promise<BookingResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
   if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
-    }
-  try {
-    return await assignBookingToEmployee(bookingId, employeeId, token);
-  } catch (error: any) {
-    if(error instanceof AxiosError) {
-      console.error('Axios response message:', error.response?.data.message);
-    } else {
-      console.error('Error message:', error.message);
-    }
-    return {
-      status: error.response?.status,
-      errors: error.response?.data,
-    };
-  }
-}
-
-export async function useConfirmBookingWithoutDriver(bookingId: number): Promise<BookingResponse| {status?: number, errors?:any}> {
-  const token = (await getToken()) || "";
-  if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
-  }
-  try{
-    return await confirmBookingWithoutDriver(bookingId, token);
-  } catch (error: any) {
-    if(error instanceof AxiosError) {
-      console.error('Axios response message:', error.response?.data.message);
-    } else {
-      console.error('Error message:', error.message);
-    }
-    return {
-      status: error.response?.status,
-      errors: error.response?.data,
-    };
-  }
-}
-
-export async function useConfirmCarBookingWithoutDriver(bookingId: number): Promise<BookingResponse| {status?: number, errors?:any}> {
-  const token = (await getToken()) || "";
-  if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
-  }
-  try{
-    return await confirmBookingWithoutDriver(bookingId, token);
-  } catch (error: any) {
-    if(error instanceof AxiosError) {
-      console.error('Axios response message:', error.response?.data.message);
-    } else {
-      console.error('Error message:', error.message);
-    }
-    return {
-      status: error.response?.status,
-      errors: error.response?.data,
-    };
-  }
-}
-
-export async function useFinishBooking(bookingId: number, bookingStatus: BookingStatus.COMPLETED | BookingStatus.NO_SHOW): Promise<BookingResponse| {status?: number, errors?:any}> {
-  const token = (await getToken()) || "";
-  if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
-  }
-  try{
-    return await finishBooking(bookingId, bookingStatus, token);
-  } catch (error: any) {
-    if(error instanceof AxiosError) {
-      console.error('Axios response message:', error.response?.data.message);
-    } else {
-      console.error('Error message:', error.message);
-    }
-    return {
-      status: error.response?.status,
-      errors: error.response?.data,
-    };
-  }
-}
-
-export async function useGetBookingById(bookingId: number): Promise<BookingResponse | { status?: number; errors?: any }> {
-  const token = (await getToken()) || "";
-  if (!token) {
-     
-    redirect("/redirect/reset-cookie", RedirectType.replace);
+    redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await getBookingById(bookingId, token);
+    console.log('useAssignBookingToEmployee | payload', {
+      bookingId,
+      employeeId,
+    });
+    const response = await assignBookingToEmployee(
+      bookingId,
+      employeeId,
+      token
+    );
+    console.log('useAssignBookingToEmployee | response', response);
+    return response;
   } catch (error: any) {
-    if(error instanceof AxiosError) {
+    if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
     } else {
       console.error('Error message:', error.message);
@@ -133,3 +75,103 @@ export async function useGetBookingById(bookingId: number): Promise<BookingRespo
   }
 }
 
+export async function useConfirmBookingWithoutDriver(
+  bookingId: number
+): Promise<BookingResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
+  if (!token) {
+    redirect('/redirect/reset-cookie', RedirectType.replace);
+  }
+  try {
+    console.log('useConfirmBookingWithoutDriver | payload', { bookingId });
+    const response = await confirmBookingWithoutDriver(bookingId, token);
+    console.log('useConfirmBookingWithoutDriver | response', response);
+    return response;
+  } catch (error: any) {
+    if (error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response?.status,
+      errors: error.response?.data,
+    };
+  }
+}
+
+export async function useConfirmCarBookingWithoutDriver(
+  bookingId: number
+): Promise<BookingResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
+  if (!token) {
+    redirect('/redirect/reset-cookie', RedirectType.replace);
+  }
+  try {
+    console.log('useConfirmCarBookingWithoutDriver | payload', { bookingId });
+    const response = await confirmBookingWithoutDriver(bookingId, token);
+    console.log('useConfirmCarBookingWithoutDriver | response', response);
+    return response;
+  } catch (error: any) {
+    if (error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response?.status,
+      errors: error.response?.data,
+    };
+  }
+}
+
+export async function useFinishBooking(
+  bookingId: number,
+  bookingStatus: BookingStatus.COMPLETED | BookingStatus.NO_SHOW
+): Promise<BookingResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
+  if (!token) {
+    redirect('/redirect/reset-cookie', RedirectType.replace);
+  }
+  try {
+    console.log('useFinishBooking | payload', { bookingId, bookingStatus });
+    const response = await finishBooking(bookingId, bookingStatus, token);
+    console.log('useFinishBooking | response', response);
+    return response;
+  } catch (error: any) {
+    if (error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response?.status,
+      errors: error.response?.data,
+    };
+  }
+}
+
+export async function useGetBookingById(
+  bookingId: number
+): Promise<BookingResponse | { status?: number; errors?: any }> {
+  const token = (await getToken()) || '';
+  if (!token) {
+    redirect('/redirect/reset-cookie', RedirectType.replace);
+  }
+  try {
+    console.log('useGetBookingById | payload', { bookingId });
+    const response = await getBookingById(bookingId, token);
+    console.log('useGetBookingById | response', response);
+    return response;
+  } catch (error: any) {
+    if (error instanceof AxiosError) {
+      console.error('Axios response message:', error.response?.data.message);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    return {
+      status: error.response?.status,
+      errors: error.response?.data,
+    };
+  }
+}

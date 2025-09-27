@@ -14,7 +14,10 @@ export async function useGetRating(
     redirect('/redirect/reset-cookie', RedirectType.replace);
   }
   try {
-    return await getRating(token, pagination);
+    console.log('useGetRating | payload', { pagination });
+    const response = await getRating(token, pagination);
+    console.log('useGetRating | response', response);
+    return response;
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error('Axios response message:', error.response?.data.message);
