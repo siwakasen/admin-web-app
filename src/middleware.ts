@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   if (
     !token &&
     request.nextUrl.pathname !== '/' &&
-    request.nextUrl.pathname.startsWith('/forget-password')
+    !request.nextUrl.pathname.startsWith('/forget-password')
   ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
