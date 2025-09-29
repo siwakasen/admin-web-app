@@ -66,15 +66,6 @@ export function ChatRoom({
     }
   };
 
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
   const formatDate = (timestamp: string) => {
     const date = new Date(timestamp);
     const today = new Date();
@@ -91,6 +82,23 @@ export function ChatRoom({
         day: 'numeric',
       });
     }
+  };
+
+  const formatTime = (timestamp: string) => {
+    // Parse the timestamp (assuming it's in GMT+8)
+    const date = new Date(timestamp);
+
+    // If the timestamp is in GMT+8, we need to subtract 8 hours to get UTC
+    // then let JavaScript handle the conversion to user's local timezone
+    const gmtPlus8Offset = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+    const utcTime = new Date(date.getTime() - gmtPlus8Offset);
+
+    // Now convert to user's local timezone
+    return utcTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
 
   const getMessageStatusIcon = (status: ChatMessage['status']) => {
