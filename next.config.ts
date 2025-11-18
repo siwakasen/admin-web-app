@@ -8,11 +8,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.vulpbox.com',
       },
-
       {
         protocol: 'http',
         hostname: 'localhost',
       },
+      {
+        protocol: 'https',
+        hostname: '**.siwakasen.dev'
+      }
     ],
   },
   allowedDevOrigins: [
