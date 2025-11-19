@@ -5,17 +5,13 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '*.vulpbox.com',
-      },
-      {
         protocol: 'http',
         hostname: 'localhost',
       },
       {
         protocol: 'https',
-        hostname: '**.siwakasen.dev'
-      }
+        hostname: '**',
+      },
     ],
   },
   allowedDevOrigins: [
