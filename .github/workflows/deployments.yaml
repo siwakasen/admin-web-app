@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@master
       - name: deploy to Kubernetes
         uses: steebchen/kubectl@v2.0.0
-        with: 
+        with:
           config: ${{ secrets.KUBE_CONFIG }}
           command: rollout restart deployment/admin-web-app
       - name: verify deployment
