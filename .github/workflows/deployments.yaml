@@ -9,13 +9,13 @@ jobs:
       - uses: actions/checkout@master
       - name: deploy to Kubernetes
         uses: steebchen/kubectl@v2.0.0
-        with: # defaults to latest kubectl binary version
+        with: 
           config: ${{ secrets.KUBE_CONFIG }}
           command: rollout restart deployment/admin-web-app
       - name: verify deployment
         uses: steebchen/kubectl@v2.0.0
         with:
           config: ${{ secrets.KUBE_CONFIG }}
-          version: v1.21.0 # specify kubectl binary version explicitly
+          version: v1.21.0
           binaries-url: "https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl" # specify the download url explicitly
           command: rollout status deployment/admin-web-app
